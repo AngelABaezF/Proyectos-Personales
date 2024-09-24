@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menú Personalizado</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>Menú Personalizado</h1>
+    
+    <form id="customGameForm">
+        <label for="numQuestions">Número de preguntas:</label>
+        <input type="number" id="numQuestions" name="numQuestions" min="1" required><br><br>
+
+        <label for="numPlayers">Número de jugadores:</label>
+        <input type="number" id="numPlayers" name="numPlayers" min="1" required><br><br>
+
+        <div id="playerNames"></div> <!-- Aquí se generarán dinámicamente los campos para los nombres de los jugadores -->
+
+        <button type="submit">Comenzar Juego</button>
+    </form>
+
+    <script>
+        document.getElementById('customGameForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Evita que el formulario se envíe
+
+            // Obtener los datos del formulario
+            const numQuestions = document.getElementById('numQuestions').value;
+            const numPlayers = document.getElementById('numPlayers').value;
+            const playerNames = [];
+
+            // Obtener los nombres de los jugadores ingresados por el usuario
+            for (let i = 1; i <= numPlayers; i++) {
+                const playerName = document.getElementById(`player${i}`).value;
+                playerNames.push(playerName);
+            }
+
+            // Enviar datos al script personalizado.js
+            const formData = {
+                numQuestions: numQuestions,
+                numPlayers: numPlayers,
+                playerNames: playerNames
+            };
+            sendDataToScript(formData);
+        });
+
+        // Generar dinámicamente los campos para los nombres de los jugadores según el número de jugadores ingresado por el usuario
+        document.getElementById('numPlayers').addEventListener('input', function() {
+            const numPlayers = parseInt(this.value);
+            const playerNamesDiv = document.getElementById('playerNames');
+            playerNamesDiv.innerHTML = ''; // Limpiar cualquier campo previamente generado
+
+            for (let i = 1; i <= numPlayers; i++) {
+                const playerNameInput = document.createElement('input');
+                playerNameInput.type = 'text';
+                playerNameInput.id = `player${i}`;
+                playerNameInput.name = `player${i}`;
+                playerNameInput.placeholder = `Nombre del jugador ${i}`;
+                playerNameInput.required = true;
+
+                playerNamesDiv.appendChild(playerNameInput);
+                playerNamesDiv.appendChild(document.createElement('br'));
+            }
+        });
+
+        // Función para enviar los datos del formulario a juego_personalizado.html
+        function sendDataToScript(formData) {
+            // Convertir los datos a formato JSON y enviarlos a juego_personalizado.html
+            const jsonData = JSON.stringify(formData);
+            localStorage.setItem('customGameData', jsonData); // Almacenar los datos en el almacenamiento local
+            window.location.href = 'juego_personalizado.html'; // Redirigir a la página del juego personalizado
+        }
+    </script>
+</body>
+</html>

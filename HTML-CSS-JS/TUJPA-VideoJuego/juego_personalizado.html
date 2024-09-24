@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>100 Adolescentes Dijeron</title>
+</head>
+
+<body class="general">
+    <h1>100 Adolescentes Dijeron</h1>
+    <div id="menu-personalizado">
+        <label for="num-preguntas">Número de preguntas:</label>
+        <input type="number" id="num-preguntas" min="1" max="10" value="5">
+        <br>
+        <label for="num-jugadores">Número de jugadores:</label>
+        <input type="number" id="num-jugadores" min="1" max="5" value="2" onchange="actualizarCamposJugadores()">
+        <br>
+        <label>Asignar nombres a los jugadores:</label>
+        <input type="radio" id="asignar-nombres-no" name="asignar-nombres" value="no" checked
+            onchange="toggleCamposNombres()"> No
+        <input type="radio" id="asignar-nombres-si" name="asignar-nombres" value="si" onchange="toggleCamposNombres()">
+        Sí
+        <br>
+        <div id="campos-nombres" style="display: none;"></div>
+        <button onclick="iniciarJuegoPersonalizado()">Iniciar juego</button>
+    </div>
+    <div id="orden-jugadores" style="display: none;">
+        <h2>Orden de los jugadores:</h2>
+        <ul id="lista-orden-jugadores"></ul>
+        <button onclick="comenzarJuego()">Comenzar</button>
+    </div>
+    <div id="pregunta-container" style="display: none;">
+        <p id="pregunta-texto"></p>
+        <p id="vidas-jugador"></p>
+        <input type="text" id="respuesta-input" placeholder="Ingresa tu respuesta aquí">
+        <button onclick="enviarRespuesta()">Enviar respuesta</button>
+    </div>
+    <div id="resultado-container" style="display: none;">
+        <h2>Resultados</h2>
+        <ul id="resultados-lista"></ul>
+        <p id="ganador"></p>
+        <button onclick="siguientePregunta()">Siguiente Pregunta</button>
+        <button onclick="mostrarPuntajesFinales()">Puntajes Finales</button>
+    </div>
+    <div id="puntajes-finales-container" style="display: none;">
+        <h2>Puntajes Finales</h2>
+        <ul id="lista-puntajes-finales"></ul>
+        <button onclick="reiniciarJuego()">Reiniciar Juego</button>
+    </div>
+    <script>
+        const preguntas = [
+            {
+                pregunta: "Edad en la que los adolescentes comienzan a tomar alcohol…",
+                respuestas: [
+                    { respuesta: "12 años", puntaje: 10 },
+                    { respuesta: "14 años", puntaje: 8 },
+                    { respuesta: "16 años", puntaje: 6 },
+                    { respuesta: "18 años", puntaje: 4 }
+                ]
+            },
+            {
+                pregunta: "Edad a la que empiezan a sufrir bullying…",
+                respuestas: [
+                    { respuesta: "10 años", puntaje: 10 },
+                    { respuesta: "12 años", puntaje: 8 },
+                    { respuesta: "14 años", puntaje: 6 },
+                    { respuesta: "16 años", puntaje: 4 }
+                ]
+            },
+            {
+                pregunta: "Edad en la que por primera vez sufrieron bullying…",
+                respuestas: [
+                    { respuesta: "10 años", puntaje: 10 },
+                    { respuesta: "12 años", puntaje: 8 },
+                    { respuesta: "14 años", puntaje: 6 },
+                    { respuesta: "16 años", puntaje: 4 }
+                ]
+            },
+            {
+                pregunta: "Sentimientos que provocan ser víctima de bullying…",
+                respuestas: [
+                    { respuesta: "Miedo", puntaje: 10 },
+                    { respuesta: "Tristeza", puntaje: 8 },
+                    { respuesta: "Inseguridad", puntaje: 6 },
+                    { respuesta: "Soledad", puntaje: 4 }
+                ]
+            },
+            {
+                pregunta: "Red social más popular entre los adolescentes…",
+                respuestas: [
+                    { respuesta: "Instagram", puntaje: 10 },
+                    { respuesta: "Snapchat", puntaje: 8 },
+                    { respuesta: "TikTok", puntaje: 6 },
+                    { respuesta: "Facebook", puntaje: 4 }
+                ]
+            },
+            {
+                pregunta: "Género musical más escuchado por los adolescentes…",
+                respuestas: [
+                    { respuesta: "Reggaeton", puntaje: 10 },
+                    { respuesta: "Pop", puntaje: 8 },
+                    { respuesta: "Hip-hop/Rap", puntaje: 6 },
+                    { respuesta: "Rock", puntaje: 4 }
+                ]
+            },
+            {
+                pregunta: "Deporte más practicado entre los adolescentes…",
+                respuestas: [
+                    { respuesta: "Fútbol", puntaje: 10 },
+                    { respuesta: "Baloncesto", puntaje: 8 },
+                    { respuesta: "Atletismo", puntaje: 6 },
+                    { respuesta: "Natación", puntaje: 4 }
+                ]
+            },
+            {
+                pregunta: "Principales miedos de un adolescente…",
+                respuestas: [
+                    { respuesta: "Fracaso académico", puntaje: 10 },
+                    { respuesta: "Rechazo social", puntaje: 8 },
+                    { respuesta: "Problemas familiares", puntaje: 6 },
+                    { respuesta: "Presión de grupo", puntaje: 4 }
+                ]
+            },
+            {
+                pregunta: "Actividades recreativas que más disfrutan los adolescentes…",
+                respuestas: [
+                    { respuesta: "Videojuegos", puntaje: 10 },
+                    { respuesta: "Salir con amigos", puntaje: 8 },
+                    { respuesta: "Ir al cine", puntaje: 6 },
+                    { respuesta: "Practicar deportes", puntaje: 4 }
+                ]
+            },
+            {
+                pregunta: "Razones por las que un adolescente huye de su casa…",
+                respuestas: [
+                    { respuesta: "Problemas familiares", puntaje: 10 },
+                    { respuesta: "Maltrato", puntaje: 8 },
+                    { respuesta: "Presión emocional", puntaje: 6 },
+                    { respuesta: "Conflictos escolares", puntaje: 4 }
+                ]
+            },
+            {
+                pregunta: "Reto en redes sociales más popular",
+                respuestas: [
+                    { respuesta: "Reto de la canela", puntaje: 10 },
+                    { respuesta: "Reto del maniquí", puntaje: 8 },
+                    { respuesta: "Reto del piso es lava", puntaje: 6 },
+                    { respuesta: "Reto del balde de hielo", puntaje: 4 }
+                ]
+            },
+            {
+                pregunta: "Excusas de los adolescentes para no ir a la escuela…",
+                respuestas: [
+                    { respuesta: "Estoy enfermo", puntaje: 10 },
+                    { respuesta: "No tengo tarea", puntaje: 8 },
+                    { respuesta: "Me duele la cabeza", puntaje: 6 },
+                    { respuesta: "No me siento bien", puntaje: 4 }
+                ]
+            },
+            {
+                pregunta: "Razones por las que un adolescente no hace la tarea…",
+                respuestas: [
+                    { respuesta: "Se le olvidó", puntaje: 10 },
+                    { respuesta: "No entiende el tema", puntaje: 8 },
+                    { respuesta: "No tiene tiempo", puntaje: 6 },
+                    { respuesta: "No quiere hacerla", puntaje: 4 }
+                ]
+            },
+            {
+                pregunta: "Excusas de adolescentes para no hacer la tarea…",
+                respuestas: [
+                    { respuesta: "Mi perro la comió", puntaje: 10 },
+                    { respuesta: "Mi hermano la botó", puntaje: 8 },
+                    { respuesta: "No la encontré", puntaje: 6 },
+                    { respuesta: "Se me olvidó", puntaje: 4 }
+                ]
+            },
+            {
+                pregunta: "Comida favorita de los adolescentes…",
+                respuestas: [
+                    { respuesta: "Pizza", puntaje: 10 },
+                    { respuesta: "Hamburguesa", puntaje: 8 },
+                    { respuesta: "Tacos", puntaje: 6 },
+                    { respuesta: "Sushi", puntaje: 4 }
+                ]
+            },
+            {
+                pregunta: "Bebida favorita de los adolescentes…",
+                respuestas: [
+                    { respuesta: "Refresco", puntaje: 10 },
+                    { respuesta: "Jugo", puntaje: 8 },
+                    { respuesta: "Agua", puntaje: 6 },
+                    { respuesta: "Té", puntaje: 4 }
+                ]
+            },
+            {
+                pregunta: "Materia escolar favorita de los adolescentes…",
+                respuestas: [
+                    { respuesta: "Educación Física", puntaje: 10 },
+                    { respuesta: "Matemáticas", puntaje: 8 },
+                    { respuesta: "Arte", puntaje: 6 },
+                    { respuesta: "Historia", puntaje: 4 }
+                ]
+            },
+            {
+                pregunta: "Formas de copiar en un examen…",
+                respuestas: [
+                    { respuesta: "Mirar al compañero", puntaje: 10 },
+                    { respuesta: "Copiar del libro", puntaje: 8 },
+                    { respuesta: "Hacer trampa con el celular", puntaje: 6 },
+                    { respuesta: "Pedir ayuda al profesor", puntaje: 4 }
+                ]
+            },
+            {
+                pregunta: "Súper poder de los adolescentes…",
+                respuestas: [
+                    { respuesta: "Invisibilidad", puntaje: 10 },
+                    { respuesta: "Volar", puntaje: 8 },
+                    { respuesta: "Telepatía", puntaje: 6 },
+                    { respuesta: "Telequinesis", puntaje: 4 }
+                ]
+            },
+            {
+                pregunta: "Pasatiempo favorito de un adolescente…",
+                respuestas: [
+                    { respuesta: "Ver series", puntaje: 10 },
+                    { respuesta: "Jugar videojuegos", puntaje: 8 },
+                    { respuesta: "Leer libros", puntaje: 6 },
+                    { respuesta: "Hacer ejercicio", puntaje: 4 }
+                ]
+            },
+            {
+                pregunta: "Hora a la que va se duerme un adolescente…",
+                respuestas: [
+                    { respuesta: "12:00 a.m.", puntaje: 10 },
+                    { respuesta: "1:00 a.m.", puntaje: 8 },
+                    { respuesta: "2:00 a.m.", puntaje: 6 },
+                    { respuesta: "3:00 a.m. o más tarde", puntaje: 4 }
+                ]
+            },
+            {
+                pregunta: "Que es lo que más le gusta a un adolescente de su comunidad…",
+                respuestas: [
+                    { respuesta: "Parque", puntaje: 10 },
+                    { respuesta: "Centro comercial", puntaje: 8 },
+                    { respuesta: "Cine", puntaje: 6 },
+                    { respuesta: "Cafetería", puntaje: 4 }
+                ]
+            },
+            {
+                pregunta: "Peligros más importantes en tu comunidad…",
+                respuestas: [
+                    { respuesta: "Inseguridad", puntaje: 10 },
+                    { respuesta: "Drogadicción", puntaje: 8 },
+                    { respuesta: "Contaminación", puntaje: 6 },
+                    { respuesta: "Violencia", puntaje: 4 }
+                ]
+            },
+            {
+                pregunta: "Delitos que más se cometen en tu comunidad…",
+                respuestas: [
+                    { respuesta: "Robo", puntaje: 10 },
+                    { respuesta: "Asalto", puntaje: 8 },
+                    { respuesta: "Vandalismo", puntaje: 6 },
+                    { respuesta: "Tráfico de drogas", puntaje: 4 }
+                ]
+            },
+            {
+                pregunta: "Edad en la que los adolescentes tienen su primera novia o novio…",
+                respuestas: [
+                    { respuesta: "13 años", puntaje: 10 },
+                    { respuesta: "14 años", puntaje: 8 },
+                    { respuesta: "15 años", puntaje: 6 },
+                    { respuesta: "16 años o más tarde", puntaje: 4 }
+                ]
+            },
+            {
+                pregunta: "Edad más frecuente en la una mujer adolescentes se han embarazado…",
+                respuestas: [
+                    { respuesta: "16 años", puntaje: 10 },
+                    { respuesta: "17 años", puntaje: 8 },
+                    { respuesta: "18 años", puntaje: 6 },
+                    { respuesta: "19 años o más tarde", puntaje: 4 }
+                ]
+            },
+            {
+                pregunta: "Método anticonceptivo que más conocen los adolescentes",
+                respuestas: [
+                    { respuesta: "Condón", puntaje: 10 },
+                    { respuesta: "Pastillas anticonceptivas", puntaje: 8 },
+                    { respuesta: "Inyecciones", puntaje: 6 },
+                    { respuesta: "Implantes", puntaje: 4 }
+                ]
+            },
+            {
+                pregunta: "Droga más dañina para el ser humano…",
+                respuestas: [
+                    { respuesta: "Heroína", puntaje: 10 },
+                    { respuesta: "Cocaína", puntaje: 8 },
+                    { respuesta: "Metanfetaminas", puntaje: 6 },
+                    { respuesta: "LSD", puntaje: 4 }
+                ]
+            },
+            {
+                pregunta: "Drogas con las que tienen contacto los adolescentes…",
+                respuestas: [
+                    { respuesta: "Marihuana", puntaje: 10 },
+                    { respuesta: "Cocaína", puntaje: 8 },
+                    { respuesta: "Éxtasis", puntaje: 6 },
+                    { respuesta: "Anfetaminas", puntaje: 4 }
+                ]
+            },
+            {
+                pregunta: "Delito que los adolescentes cometen en su primera vez…",
+                respuestas: [
+                    { respuesta: "Robo", puntaje: 10 },
+                    { respuesta: "Vandalismo", puntaje: 8 },
+                    { respuesta: "Consumo de drogas", puntaje: 6 },
+                    { respuesta: "Pelear", puntaje: 4 }
+                ]
+            },
+            {
+                pregunta: "Reglas que menos siguen los adolescentes en casa…",
+                respuestas: [
+                    { respuesta: "Hacer la cama", puntaje: 10 },
+                    { respuesta: "Lavar los platos", puntaje: 8 },
+                    { respuesta: "Recoger su habitación", puntaje: 6 },
+                    { respuesta: "Ayudar en las tareas del hogar", puntaje: 4 }
+                ]
+            },
+            {
+                pregunta: "Reglas que menos siguen los adolescentes en la escuela…",
+                respuestas: [
+                    { respuesta: "No usar celular en clase", puntaje: 10 },
+                    { respuesta: "Llegar a tiempo", puntaje: 8 },
+                    { respuesta: "Hacer la tarea", puntaje: 6 },
+                    { respuesta: "Respetar al profesor", puntaje: 4 }
+                ]
+            },
+            {
+                pregunta: "Es el mejor amigo de un adolescente…",
+                respuestas: [
+                    { respuesta: "Su mascota", puntaje: 10 },
+                    { respuesta: "Su hermano(a)", puntaje: 8 },
+                    { respuesta: "Su mejor amigo(a)", puntaje: 6 },
+                    { respuesta: "Su novio(a)", puntaje: 4 }
+                ]
+            },
+            {
+                pregunta: "Derecho que más conocen los adolescentes…",
+                respuestas: [
+                    { respuesta: "Derecho a la educación", puntaje: 10 },
+                    { respuesta: "Derecho a la salud", puntaje: 8 },
+                    { respuesta: "Derecho a la libertad de expresión", puntaje: 6 },
+                    { respuesta: "Derecho a la igualdad", puntaje: 4 }
+                ]
+            },
+            {
+                pregunta: "A quién le tienen más confianza los adolescentes…",
+                respuestas: [
+                    { respuesta: "A sus amigos", puntaje: 10 },
+                    { respuesta: "A sus padres", puntaje: 8 },
+                    { respuesta: "A sus hermanos", puntaje: 6 },
+                    { respuesta: "A sus profesores", puntaje: 4 }
+                ]
+            },
+            {
+                pregunta: "Cuál es la meta más importante para un adolescente…",
+                respuestas: [
+                    { respuesta: "Ser feliz", puntaje: 10 },
+                    { respuesta: "Tener éxito profesional", puntaje: 8 },
+                    { respuesta: "Viajar por el mundo", puntaje: 6 },
+                    { respuesta: "Formar una familia", puntaje: 4 }
+                ]
+            },
+            {
+                pregunta: "Cualidades de los adolescentes…",
+                respuestas: [
+                    { respuesta: "Creatividad", puntaje: 10 },
+                    { respuesta: "Resiliencia", puntaje: 8 },
+                    { respuesta: "Empatía", puntaje: 6 },
+                    { respuesta: "Independencia", puntaje: 4 }
+                ]
+            },
+            {
+                pregunta: "Cuál es el cambio más importante de la etapa adolescente…",
+                respuestas: [
+                    { respuesta: "Pubertad", puntaje: 10 },
+                    { respuesta: "Independencia", puntaje: 8 },
+                    { respuesta: "Identidad", puntaje: 6 },
+                    { respuesta: "Responsabilidad", puntaje: 4 }
+                ]
+            },
+            {
+                pregunta: "Mayor preocupación de los adolescentes…",
+                respuestas: [
+                    { respuesta: "Futuro laboral", puntaje: 10 },
+                    { respuesta: "Relaciones sociales", puntaje: 8 },
+                    { respuesta: "Salud mental", puntaje: 6 },
+                    { respuesta: "Presión académica", puntaje: 4 }
+                ]
+            },
+            {
+                pregunta: "Para que sirve estudiar a un adolescente…",
+                respuestas: [
+                    { respuesta: "Desarrollo personal", puntaje: 10 },
+                    { respuesta: "Mejorar el futuro", puntaje: 8 },
+                    { respuesta: "Adquirir conocimientos", puntaje: 6 },
+                    { respuesta: "Prepararse para la vida", puntaje: 4 }
+                ]
+            },
+            {
+                pregunta: "Actividad laboral que más le gustaría a un adolescente…",
+                respuestas: [
+                    { respuesta: "Trabajar en tecnología", puntaje: 10 },
+                    { respuesta: "Trabajar en entretenimiento", puntaje: 8 },
+                    { respuesta: "Trabajar en arte", puntaje: 6 },
+                    { respuesta: "Trabajar en ciencia", puntaje: 4 }
+                ]
+            },
+            {
+                pregunta: "Libro preferido de los adolescentes…",
+                respuestas: [
+                    { respuesta: "Harry Potter", puntaje: 10 },
+                    { respuesta: "Los Juegos del Hambre", puntaje: 8 },
+                    { respuesta: "Crepúsculo", puntaje: 6 },
+                    { respuesta: "El Señor de los Anillos", puntaje: 4 }
+                ]
+            },
+            {
+                pregunta: "Sanciones que pueden imponerse a los adolescentes que cometen delitos",
+                respuestas: [
+                    { respuesta: "Reclusión", puntaje: 10 },
+                    { respuesta: "Servicio comunitario", puntaje: 8 },
+                    { respuesta: "Multas", puntaje: 6 },
+                    { respuesta: "Libertad condicional", puntaje: 4 }
+                ]
+            },
+            {
+                pregunta: "Autoridades que más conocen los adolescentes",
+                respuestas: [
+                    { respuesta: "Policía", puntaje: 10 },
+                    { respuesta: "Juez", puntaje: 8 },
+                    { respuesta: "Presidente", puntaje: 6 },
+                    { respuesta: "Gobernador", puntaje: 4 }
+                ]
+            },
+            {
+                pregunta: "Autoridad en la que más pueden confiar los adolescentes",
+                respuestas: [
+                    { respuesta: "Padres", puntaje: 10 },
+                    { respuesta: "Maestros", puntaje: 8 },
+                    { respuesta: "Amigos", puntaje: 6 },
+                    { respuesta: "Policía", puntaje: 4 }
+                ]
+            },
+            {
+                pregunta: "Actividad comunitaria en la que más participan los adolescentes",
+                respuestas: [
+                    { respuesta: "Voluntariado", puntaje: 10 },
+                    { respuesta: "Eventos deportivos", puntaje: 8 },
+                    { respuesta: "Talleres culturales", puntaje: 6 },
+                    { respuesta: "Conciertos benéficos", puntaje: 4 }
+                ]
+            },
+            {
+                pregunta: "Temas de interés de los adolescentes",
+                respuestas: [
+                    { respuesta: "Cambio climático", puntaje: 10 },
+                    { respuesta: "Derechos humanos", puntaje: 8 },
+                    { respuesta: "Igualdad de género", puntaje: 6 },
+                    { respuesta: "Salud mental", puntaje: 4 }
+                ]
+            },
+            {
+                pregunta: "Medidas preventivas que más conocen los adolescentes",
+                respuestas: [
+                    { respuesta: "Vacunación", puntaje: 10 },
+                    { respuesta: "Lavado de manos", puntaje: 8 },
+                    { respuesta: "Uso de preservativo", puntaje: 6 },
+                    { respuesta: "Educación sexual", puntaje: 4 }
+                ]
+            },
+            {
+                pregunta: "Series que más han visto los adolescentes",
+                respuestas: [
+                    { respuesta: "Stranger Things", puntaje: 10 },
+                    { respuesta: "13 Reasons Why", puntaje: 8 },
+                    { respuesta: "Riverdale", puntaje: 6 },
+                    { respuesta: "La Casa de Papel", puntaje: 4 }
+                ]
+            },
+            {
+                pregunta: "Sitios de Morelos que más visitan los adolescentes",
+                respuestas: [
+                    { respuesta: "Tepoztlán", puntaje: 10 },
+                    { respuesta: "Cuernavaca", puntaje: 8 },
+                    { respuesta: "Tequesquitengo", puntaje: 6 },
+                    { respuesta: "Xochicalco", puntaje: 4 }
+                ]
+            }
+            // Agrega más preguntas aquí
+        ];
+
+        let preguntaActual = 0;
+        let respuestasUsuario = [];
+        let numPreguntas = 5;
+        let numJugadores = 2;
+        let jugadores = [];
+        let jugadorActual = 0;
+        let respuestasTodas = [];
+
+        function mezclarPreguntas() {
+            for (let i = preguntas.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [preguntas[i], preguntas[j]] = [preguntas[j], preguntas[i]];
+            }
+        }
+
+        mezclarPreguntas();
+
+        function mostrarPregunta() {
+            const preguntaTexto = document.getElementById('pregunta-texto');
+            preguntaTexto.textContent = preguntas[preguntaActual].pregunta;
+        }
+
+        function actualizarVidasJugador() {
+            document.getElementById('vidas-jugador').textContent = `Vidas de ${jugadores[jugadorActual].nombre}: ${jugadores[jugadorActual].vidas}`;
+        }
+
+        function enviarRespuesta() {
+            const respuestaInput = document.getElementById('respuesta-input');
+            const respuestaUsuario = respuestaInput.value.toLowerCase();
+            const respuestasComunes = preguntas[preguntaActual].respuestas;
+            let puntajeRespuesta = 0;
+
+            if (respuestasTodas.includes(respuestaUsuario)) {
+                jugadores[jugadorActual].vidas--;
+                actualizarVidasJugador();
+                if (jugadores[jugadorActual].vidas === 0) {
+                    alert(`Jugador ${jugadores[jugadorActual].nombre} ha perdido todas sus vidas.`);
+                    respuestaInput.value = '';
+                    siguienteJugador();
+                    return;
+                } else {
+                    alert(`Respuesta repetida. Vidas restantes: ${jugadores[jugadorActual].vidas}`);
+                    respuestaInput.value = '';
+                    return;
+                }
+            }
+
+            jugadores[jugadorActual].respuestas.push({
+                pregunta: preguntas[preguntaActual].pregunta,
+                respuesta: respuestaUsuario
+            });
+            respuestasTodas.push(respuestaUsuario);
+
+            for (let i = 0; i < respuestasComunes.length; i++) {
+                if (respuestaUsuario === respuestasComunes[i].respuesta.toLowerCase()) {
+                    puntajeRespuesta = respuestasComunes[i].puntaje;
+                    break;
+                }
+            }
+
+            jugadores[jugadorActual].puntaje += puntajeRespuesta;
+
+            preguntaActual++;
+            if (preguntaActual < numPreguntas) {
+                mostrarPregunta();
+                respuestaInput.value = '';
+            } else {
+                siguienteJugador();
+            }
+        }
+
+        function siguienteJugador() {
+            preguntaActual = 0;
+            jugadorActual++;
+            if (jugadorActual < numJugadores) {
+                mostrarPregunta();
+                actualizarVidasJugador();
+                document.getElementById('respuesta-input').value = '';
+            } else {
+                mostrarResultados();
+            }
+        }
+
+        function mostrarResultados() {
+            document.getElementById('pregunta-container').style.display = 'none';
+            document.getElementById('resultado-container').style.display = 'block';
+
+            const resultadosLista = document.getElementById('resultados-lista');
+            resultadosLista.innerHTML = '';
+
+            preguntas.slice(0, numPreguntas).forEach((pregunta, index) => {
+                resultadosLista.innerHTML += `<h3>${pregunta.pregunta}</h3>`;
+                resultadosLista.innerHTML += '<ul>';
+                pregunta.respuestas.forEach((respuesta, i) => {
+                    resultadosLista.innerHTML += `<li>${i + 1}. Respuesta: ${respuesta.respuesta}, Puntaje: ${respuesta.puntaje}</li>`;
+                });
+                jugadores.forEach(jugador => {
+                    const respuestaJugador = jugador.respuestas[index]?.respuesta || "No respondida";
+                    const puntajeRespuesta = pregunta.respuestas.find(r => r.respuesta.toLowerCase() === respuestaJugador.toLowerCase())?.puntaje || 0;
+                    resultadosLista.innerHTML += `<li>${jugador.nombre}: ${respuestaJugador} (Puntaje: ${puntajeRespuesta})</li>`;
+                });
+                resultadosLista.innerHTML += '</ul>';
+            });
+
+            const ganador = jugadores.reduce((max, jugador) => jugador.puntaje > max.puntaje ? jugador : max, jugadores[0]);
+            document.getElementById('ganador').textContent = `Ganador: ${ganador.nombre} con ${ganador.puntaje} puntos`;
+        }
+
+        function siguientePregunta() {
+            preguntaActual++;
+            if (preguntaActual < numPreguntas) {
+                document.getElementById('resultado-container').style.display = 'none';
+                document.getElementById('pregunta-container').style.display = 'block';
+                mostrarPregunta();
+                actualizarVidasJugador();
+            } else {
+                mostrarPuntajesFinales();
+            }
+        }
+
+        function mostrarPuntajesFinales() {
+            document.getElementById('resultado-container').style.display = 'none';
+            document.getElementById('puntajes-finales-container').style.display = 'block';
+
+            const listaPuntajesFinales = document.getElementById('lista-puntajes-finales');
+            listaPuntajesFinales.innerHTML = '';
+            jugadores.sort((a, b) => b.puntaje - a.puntaje).forEach((jugador, index) => {
+                listaPuntajesFinales.innerHTML += `<li>${index + 1}. ${jugador.nombre}: ${jugador.puntaje} puntos</li>`;
+            });
+        }
+
+        function reiniciarJuego() {
+            preguntaActual = 0;
+            respuestasUsuario = [];
+            respuestasTodas = [];
+            jugadorActual = 0;
+            mezclarPreguntas();
+
+            document.getElementById('pregunta-container').style.display = 'none';
+            document.getElementById('resultado-container').style.display = 'none';
+            document.getElementById('puntajes-finales-container').style.display = 'none';
+            document.getElementById('menu-personalizado').style.display = 'block';
+            document.getElementById('num-preguntas').value = 5;
+            document.getElementById('num-jugadores').value = 2;
+            document.getElementById('campos-nombres').style.display = 'none';
+            document.getElementById('asignar-nombres-no').checked = true;
+        }
+
+        function actualizarCamposJugadores() {
+            const numJugadores = parseInt(document.getElementById('num-jugadores').value);
+            const camposNombres = document.getElementById('campos-nombres');
+            camposNombres.innerHTML = '';
+            for (let i = 0; i < numJugadores; i++) {
+                camposNombres.innerHTML += `<label for="jugador-nombre-${i + 1}">Jugador ${i + 1}: </label>`;
+                camposNombres.innerHTML += `<input type="text" id="jugador-nombre-${i + 1}" placeholder="Nombre del Jugador ${i + 1}"><br>`;
+            }
+        }
+
+        function toggleCamposNombres() {
+            const camposNombres = document.getElementById('campos-nombres');
+            const asignarNombresSi = document.getElementById('asignar-nombres-si');
+            if (asignarNombresSi.checked) {
+                actualizarCamposJugadores();
+                camposNombres.style.display = 'block';
+            } else {
+                camposNombres.style.display = 'none';
+            }
+        }
+
+        function iniciarJuegoPersonalizado() {
+            numPreguntas = parseInt(document.getElementById('num-preguntas').value);
+            numJugadores = parseInt(document.getElementById('num-jugadores').value);
+            jugadores = [];
+
+            const asignarNombres = document.querySelector('input[name="asignar-nombres"]:checked').value;
+
+            for (let i = 0; i < numJugadores; i++) {
+                let nombreJugador = `Jugador ${i + 1}`;
+                if (asignarNombres === 'si') {
+                    const nombreInput = document.getElementById(`jugador-nombre-${i + 1}`);
+                    if (nombreInput && nombreInput.value.trim() !== '') {
+                        nombreJugador = nombreInput.value.trim();
+                    }
+                }
+                jugadores.push({
+                    nombre: nombreJugador,
+                    puntaje: 0,
+                    respuestas: [],
+                    vidas: 3
+                });
+            }
+
+            jugadores = jugadores.sort(() => Math.random() - 0.5);
+            const listaOrdenJugadores = document.getElementById('lista-orden-jugadores');
+            listaOrdenJugadores.innerHTML = '';
+            jugadores.forEach(jugador => {
+                listaOrdenJugadores.innerHTML += `<li>${jugador.nombre}</li>`;
+            });
+
+            document.getElementById('menu-personalizado').style.display = 'none';
+            document.getElementById('orden-jugadores').style.display = 'block';
+        }
+
+        function comenzarJuego() {
+            document.getElementById('orden-jugadores').style.display = 'none';
+            document.getElementById('pregunta-container').style.display = 'block';
+            mostrarPregunta();
+            actualizarVidasJugador();
+        }
+    </script>
+</body>
+
+</html>

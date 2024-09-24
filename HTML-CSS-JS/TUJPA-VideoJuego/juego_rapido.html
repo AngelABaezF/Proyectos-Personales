@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>100 Adolescentes Dijeron</title>
+    <link rel="stylesheet" href="estilos.css">
+</head>
+<body class="general">
+    <h1>100 Adolescentes Dijeron</h1>
+    <div id="pregunta-container">
+        <p id="pregunta-texto"></p>
+        <input type="text" id="respuesta-input" placeholder="Ingresa tu respuesta aquí">
+        <button onclick="enviarRespuesta()">Enviar respuesta</button>
+    </div>
+    <div id="resultado-container" style="display: none;">
+        <h2>Resultados</h2>
+        <ul id="resultados-lista"></ul>
+        <p id="puntaje-final"></p>
+        <button id="reiniciar-btn">Volver a jugar</button>
+    </div>
+    <script src="rapido.js"></script>
+</body>
+</html>

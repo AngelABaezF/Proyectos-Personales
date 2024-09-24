@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <link rel="stylesheet" href="style.css">
+    <title>HealthFinder</title>
+
+</head>
+
+<body>
+    <section id="section_app">
+        <nav id="navbar">
+            <img src="./HealthFinder_Logo.png" id="logo_nav" alt="IMAGEN DEL LOGO">
+            <ul>
+                <li><a href="./index.html">Inicio</a></li>
+            </ul>
+        </nav>
+
+        <div id="buscador">
+            <div id="serviceInput">
+                <input id="buscador_input" type="text" placeholder="Introduce el nombre del servicio">
+            </div>
+            <button id="boton_location" onclick="locateNearestPharmacy()">Buscar farmacias</button>
+        </div>
+
+        <div id="respuesta">
+            <div id="map"></div>
+            <div id="resultados">
+                <div id="ficha_resultado1">
+                    <p><b>Farmacia del Ahorro, Temixco</b></p>
+                    <div id="costoTransporte">
+                        costo de transporte
+                    </div>
+                </div>
+                <div id="ficha_resultado2">
+                    <p><b>Farmacia Guadalajara, Palmira</b></p>
+                    <div id="costoTransporte">
+                        costo de transporte
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </section>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="set_map.js"></script>
+</body>
+
+</html>
