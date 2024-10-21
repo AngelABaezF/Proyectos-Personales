@@ -1,40 +1,49 @@
 -- Borrar base de datos
-drop database entrenamientoEmpleados;
+drop database empleados;
 
 -- Creación de la base de datos
-create database entrenamientoEmpleados;
-use entrenamientoEmpleados;
+create database empleados;
+use empleados;
 
 -- Creación de las Tablas
-create table employee (
-    eID int primary key,
-    eLast varchar(8),
-    eFirst varchar(8),
-    eTitle text,
-    eSalary int
+CREATE TABLE employee(
+eID INT,
+eLast VARCHAR(7),
+eFirst VARCHAR(8),
+eTittle VARCHAR(50),
+eSalary DOUBLE,
+PRIMARY KEY(eID)
 );
 
-create table trainingCourse (
-	cID varchar(5) primary key,
-    cTitle text,
-    cHours int,
-    areaID varchar(2)
+CREATE TABLE technologyArea(
+aID VARCHAR(2),
+aTitle VARCHAR(45),
+aURL VARCHAR(45),
+leadID INT,
+PRIMARY KEY(aID),
+CONSTRAINT fk_employee_technologyArea1
+FOREIGN KEY(leadID) REFERENCES employee(eID)
 );
 
-create table technologyArea (
-	aID varchar(2) primary key,
-    aTitle text,
-    aUrl text,
-    leadID int
+CREATE TABLE trainingCourse(
+cID VARCHAR(4),
+cTittle VARCHAR(45),
+cHours INT,
+areaID VARCHAR(2),
+PRIMARY KEY(cID),
+CONSTRAINT fk_technologyArea_trainingCourse1
+FOREIGN KEY(areaID) REFERENCES technologyArea(aID)
 );
 
-create table takes (
-    eID int,
-    cID varchar(5),
-    tYear year,
-    tMonth int,
-    tDay int,
-    primary key (eID, cID),
-    foreign key (eID) references employee(eID),
-    foreign key (cID) references trainingCourse(cID)
+CREATE TABLE takes(
+eID INT,
+cID VARCHAR(4),
+tYear INT,
+tMonth INT,
+tDay INT,
+PRIMARY KEY(eID, cID),
+CONSTRAINT fk_employee_takes1
+FOREIGN KEY(eID) REFERENCES employee(eID),
+CONSTRAINT fk_trainingCourse_takes1
+FOREIGN KEY(cID) REFERENCES trainingCourse(cID)
 );

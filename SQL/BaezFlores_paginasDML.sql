@@ -1,7 +1,7 @@
 -- Llenado de las tablas
-insert into webpage values
+INSERT INTO webpage VALUES
 ('01', 'CSE412 Web', 'https://www.eas.asu.edu/~cse412/', '01','20'),
-('02', 'CSE412 Web', 'gen_syllabus.html', '01','10'), 
+('02', 'CSE412 Web', 'gen_syllabus.html', '01','10'),
 ('03', 'CSE412 Web', 'fall98/calendar.html', '01','18'),
 ('04', 'CSE412 Web', 'pub.html', '01','5'),
 ('05', 'CSE412 Web', 'winRDBI.html', '01','1'),
@@ -17,7 +17,7 @@ insert into webpage values
 ('15', 'CSE412 Web', 'class_notes.html', '13','11'),
 ('16', 'CSE412 Web', 'hypernews.html', '13','21');
 
-insert graphic values
+INSERT INTO graphic VALUES
 ('01','background','gif','cse14/www/graphics/'),
 ('02','bar','gif','cse14/www/graphics/'),
 ('03','button 1','jpg','cse14/www/graphics/'),
@@ -31,7 +31,7 @@ insert graphic values
 ('11','lock','jpg','cse14/www/graphics/'),
 ('12','stone','bmp','cse14/www/graphics/');
 
-insert courseware values 
+INSERT INTO courseware VALUES
 ('doc1','WinRDBI Setup','uh/ftp/class/cse412/winrdb/','D'),
 ('doc2','WinRDBI User Guide','uh/ftp/class/cse412/winrdb/','D'),
 ('exe1','WinRDBI Setup','uh/ftp/class/cse412/winrdb/','E'),
@@ -42,19 +42,19 @@ insert courseware values
 ('pub2','Company Theory','uh/ftp/class/cse412/projects/','P'),
 ('pub3','A Cp-operative Learning Approach','uh/ftp/class/cse412/pubs/','P');
 
-insert into display values
+INSERT INTO display VALUES
 ('01','01'), ('06','01'), ('07','01'), ('01','02'),
 ('02','02'), ('06','02'), ('01','03'), ('07','03'), ('01','04'),
 ('04','06'),('04','07'), ('01','08'), ('03','08'), ('01','09'),
 ('03','09'), ('09','09'), ('08','11'), ('04','12');
 
-insert into httpLink values
-('02','01'), ('03','01'), ('01','02'), ('01','03'), ('01','04'), ('01','05'), 
-('04','05'), ('06','05'), ('01','06'), ('01','07'), ('04','07'),  ('01','08'), 
-('08','09'), ('11','09'), ('09','10'),  ('09','11'), ('09','12'), ('11','12'), 
-('08','13'), ('14','13'), ('13','14'), ('13','15'),  ('14','15'), ('13','16');
+INSERT INTO httpLink VALUES
+('02','01'), ('03','01'), ('01','02'), ('01','03'), ('01','04'), ('01','05'),
+('04','05'), ('06','05'), ('01','06'), ('01','07'), ('04','07'), ('01','08'),
+('08','09'), ('11','09'), ('09','10'), ('09','11'), ('09','12'), ('11','12'),
+('08','13'), ('14','13'), ('13','14'), ('13','15'), ('14','15'), ('13','16');
 
-insert into ftpLink values
+INSERT INTO ftpLink VALUES
 ('04','doc1'), ('05','doc2'), ('05','exe1'), ('06','mdb1'),
 ('04','not1'), ('06','not1'), ('12','not1'), ('15','not1'), ('08','not2'),
 ('15','not2'),('04','pub1'), ('05','pub1'), ('06','pub1'), ('12','pub1'),

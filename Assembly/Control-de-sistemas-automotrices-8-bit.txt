@@ -1,0 +1,158 @@
+; ------------------------------------------------------------
+; Programa de control de sistemas automotrices en ensamblador
+; ------------------------------------------------------------
+; Este programa simula el control de varios sistemas en un vehículo
+; utilizando sensores para determinar el estado de cada sistema
+; (ESC, SEN, ABS, IYC). Basado en los valores de los sensores,
+; se actualizan los estados de los sistemas y se imprimen en consola.
+; Cada sistema tiene un estado que puede ser activo ('T') o inactivo ('F').
+; ------------------------------------------------------------
+
+JMP start                  ; Salta al inicio del programa
+
+; ------------------------------------------------------------
+; Variables de salida para los sistemas
+; Estas variables almacenan el estado actual de cada sistema.
+; Se inicializan en 'F' (inactivo).
+; ------------------------------------------------------------
+output_ESC: DB 'F'        ; Estado del sistema ESC (1 byte)
+output_SEN: DB 'F'        ; Estado del sistema SEN (1 byte)
+output_ABS: DB 'F'        ; Estado del sistema ABS (1 byte)
+output_IYC: DB 'F'        ; Estado del sistema IYC (1 byte)
+
+; ------------------------------------------------------------
+; Sensores y sus límites
+; Estos valores representan los límites de operación para cada sensor.
+; ------------------------------------------------------------
+sensor_direccion: DB 30   ; Límite para dirección (30)
+sensor_velocidad_lat: DB 50 ; Límite para velocidad lateral (50)
+sensor_temperatura: DB 90  ; Límite para temperatura (90)
+sensor_velocidad: DB 80    ; Límite para velocidad (80)
+sensor_friccion: DB 20     ; Límite para fricción (20)
+sensor_presion: DB 50      ; Límite para presión (50)
+sensor_temp_motor: DB 100   ; Límite para temperatura del motor (100)
+
+start:                     ; Inicio del programa
+    ; --------------------------------------------------------
+    ; Controlar ESC (Control de estabilidad)
+    ; Este bloque controla el estado del sistema ESC basado
+    ; en los valores de dirección y velocidad lateral.
+    ; --------------------------------------------------------
+    MOV A, [sensor_direccion]    ; Cargar el valor del sensor de dirección en A
+    CMP A, 30                     ; Comparar A con el límite de dirección
+    JZ ESC_INACTIVO               ; Si es cero (igual a 30), saltar a ESC_INACTIVO
+    MOV A, [sensor_velocidad_lat] ; Cargar el valor del sensor de velocidad lateral en A
+    CMP A, 50                     ; Comparar A con el límite de velocidad lateral
+    JZ ESC_INACTIVO               ; Si es cero (igual a 50), saltar a ESC_INACTIVO
+    MOV A, 'T'                    ; Si ambas condiciones son válidas, establecer estado ESC en 'T'
+    JMP ESC_CHECK                 ; Saltar a la verificación del estado de ESC
+
+ESC_INACTIVO:                 ; Estado inactivo para ESC
+    MOV A, 'F'                   ; Establecer estado ESC en 'F'
+
+ESC_CHECK:                   ; Verificar estado de ESC
+    MOV [output_ESC], A         ; Actualizar estado ESC en la variable de salida
+    CALL print_ESC               ; Imprimir estado ESC
+
+    ; --------------------------------------------------------
+    ; Controlar Enfriamiento (SEN)
+    ; Este bloque controla el estado del sistema de enfriamiento
+    ; basado en el valor de temperatura.
+    ; --------------------------------------------------------
+    MOV A, [sensor_temperatura]  ; Cargar el valor del sensor de temperatura en A
+    CMP A, 90                     ; Comparar A con el límite de temperatura
+    JZ SEN_INACTIVO               ; Si es cero (igual a 90), saltar a SEN_INACTIVO
+    MOV A, 'T'                    ; Si la condición es válida, establecer estado SEN en 'T'
+    JMP SEN_CHECK                 ; Saltar a la verificación del estado de SEN
+
+SEN_INACTIVO:                  ; Estado inactivo para SEN
+    MOV A, 'F'                   ; Establecer estado SEN en 'F'
+
+SEN_CHECK:                    ; Verificar estado de SEN
+    MOV [output_SEN], A         ; Actualizar estado SEN en la variable de salida
+    CALL print_SEN               ; Imprimir estado SEN
+
+    ; --------------------------------------------------------
+    ; Controlar ABS (Sistema de frenos antibloqueo)
+    ; Este bloque controla el estado del sistema ABS basado
+    ; en los valores de velocidad y fricción.
+    ; --------------------------------------------------------
+    MOV A, [sensor_velocidad]    ; Cargar el valor del sensor de velocidad en A
+    CMP A, 80                     ; Comparar A con el límite de velocidad
+    JZ ABS_INACTIVO               ; Si es cero (igual a 80), saltar a ABS_INACTIVO
+    MOV A, [sensor_friccion]     ; Cargar el valor del sensor de fricción en A
+    CMP A, 20                     ; Comparar A con el límite de fricción
+    JNZ ABS_ACTIVO                ; Si no es cero (mayor que 20), saltar a ABS_ACTIVO
+
+ABS_INACTIVO:                  ; Estado inactivo para ABS
+    MOV A, 'F'                   ; Establecer estado ABS en 'F'
+    JMP ABS_CHECK                ; Saltar a la verificación del estado de ABS
+
+ABS_ACTIVO:                   ; Estado activo para ABS
+    MOV A, 'T'                   ; Establecer estado ABS en 'T'
+
+ABS_CHECK:                    ; Verificar estado de ABS
+    MOV [output_ABS], A         ; Actualizar estado ABS en la variable de salida
+    CALL print_ABS               ; Imprimir estado ABS
+
+    ; --------------------------------------------------------
+    ; Controlar Inyección de Combustible (IYC)
+    ; Este bloque controla el estado de la inyección de combustible
+    ; basado en los valores de presión y temperatura del motor.
+    ; --------------------------------------------------------
+    MOV A, [sensor_presion]      ; Cargar el valor del sensor de presión en A
+    CMP A, 50                     ; Comparar A con el límite de presión
+    JZ IYC_INACTIVO               ; Si es cero (igual a 50), saltar a IYC_INACTIVO
+    MOV A, [sensor_temp_motor]    ; Cargar el valor del sensor de temperatura del motor en A
+    CMP A, 100                    ; Comparar A con el límite de temperatura del motor
+    JNZ IYC_ACTIVO                ; Si no es cero (mayor que 100), saltar a IYC_ACTIVO
+
+IYC_INACTIVO:                  ; Estado inactivo para IYC
+    MOV A, 'F'                   ; Establecer estado IYC en 'F'
+    JMP IYC_CHECK                ; Saltar a la verificación del estado de IYC
+
+IYC_ACTIVO:                   ; Estado activo para IYC
+    MOV A, 'T'                   ; Establecer estado IYC en 'T'
+
+IYC_CHECK:                    ; Verificar estado de IYC
+    MOV [output_IYC], A         ; Actualizar estado IYC en la variable de salida
+    CALL print_IYC               ; Imprimir estado IYC
+
+    HLT                          ; Detener ejecución del programa
+
+; ------------------------------------------------------------
+; Subrutinas para imprimir el estado de cada sistema
+; Cada subrutina carga el estado del sistema correspondiente
+; y lo imprime en la consola.
+; ------------------------------------------------------------
+print_ESC:                    ; Subrutina para imprimir estado ESC
+    MOV A, [output_ESC]         ; Cargar estado ESC en A
+    MOV D, 232                  ; Dirección de salida para ESC
+    CALL print_char              ; Llamar a la subrutina para imprimir un carácter
+    RET
+
+print_SEN:                    ; Subrutina para imprimir estado SEN
+    MOV A, [output_SEN]         ; Cargar estado SEN en A
+    MOV D, 234                  ; Dirección de salida para SEN
+    CALL print_char              ; Llamar a la subrutina para imprimir un carácter
+    RET
+
+print_ABS:                    ; Subrutina para imprimir estado ABS
+    MOV A, [output_ABS]         ; Cargar estado ABS en A
+    MOV D, 236                  ; Dirección de salida para ABS
+    CALL print_char              ; Llamar a la subrutina para imprimir un carácter
+    RET
+
+print_IYC:                    ; Subrutina para imprimir estado IYC
+    MOV A, [output_IYC]         ; Cargar estado IYC en A
+    MOV D, 238                  ; Dirección de salida para IYC
+    CALL print_char              ; Llamar a la subrutina para imprimir un carácter
+    RET
+
+; ------------------------------------------------------------
+; Subrutina para imprimir un solo carácter en consola
+; Esta subrutina toma un carácter de A y lo imprime en la dirección D.
+; ------------------------------------------------------------
+print_char:                  ; print_char(A:char, D:*to)
+    MOV [D], A                 ; Escribir carácter en la consola
+    RET

@@ -1,0 +1,229 @@
+; ------------------------------------------------------------
+; El programa compara los valores actuales de varios sensores con 
+; límites predefinidos para determinar el estado de cada sistema 
+; (ENCENDIDO o APAGADO). Luego, actualiza
+; las pantallas de salida con los estados de los sistemas.
+; Sistemas controlados:
+; - ABS (Sistema de Frenos Antibloqueo)
+; - ESC (Control Electrónico de Estabilidad)
+; - IYC (Sistema de Inyección de Combustible)
+; - SEN (Sistema de Enfriamiento)
+; ------------------------------------------------------------
+
+; ------------------------------------------------------------
+; Puntos de inicio de variables y direcciones clave
+; ------------------------------------------------------------
+	JMP start
+
+stackTop    EQU 0xFF
+txtDisplay1  EQU 0x2E0
+txtDisplay2  EQU 0x2E8
+txtDisplay3  EQU 0x2F0
+txtDisplay4  EQU 0x2F8
+
+; ------------------------------------------------------------
+; Variables de salida para los sistemas (Indicadores de estado)
+; Estas cadenas representan el estado actual de cada sistema.
+; Incluyen indicadores "ON" y "OFF" para mostrar si el sistema 
+; está activo o inactivo.
+; ------------------------------------------------------------
+OFF_ABS:	DB "ABS-OFF|"
+			DB 0
+            
+OFF_ESC:	DB "ESC-OFF|"
+			DB 0
+
+OFF_IYC:	DB "IYC-OFF|"
+			DB 0
+            
+OFF_SEN:	DB "SEN-OFF|"
+			DB 0
+            
+ON_ABS:		DB "|ABS-ON|"
+			DB 0
+            
+ON_ESC:		DB "|ESC-ON|"
+			DB 0
+            
+ON_IYC:		DB "|IYC-ON|"
+			DB 0
+            
+ON_SEN:		DB "|SEN-ON|"
+			DB 0
+
+; ------------------------------------------------------------
+; Sensores y sus límites de operación
+; Estos valores predefinidos representan los límites que, 
+; si se superan,  activarán una alerta en el sistema correspondiente.
+; ------------------------------------------------------------
+; ESC
+sensor_direccion: DB 30     
+sensor_velocidad_lat: DB 50 
+; IYC
+sensor_temp_motor: DB 100
+; SEN
+sensor_temperatura: DB 90 
+; ABS
+sensor_friccion: DB 20      
+sensor_presion: DB 50         
+
+; ------------------------------------------------------------
+; Valores actuales de los sensores
+; Los valores reales de los sensores se compararán con los límites.
+; ------------------------------------------------------------
+; ESC
+valor_direccion: DB 35      
+valor_velocidad_lat: DB 55
+; IYC
+valor_temp_motor: DB 105     
+; SEN  
+valor_temperatura: DB 95 
+; ABS
+valor_friccion: DB 25 
+valor_presion: DB 55
+
+; ------------------------------------------------------------
+; Punto de inicio del programa
+; Configura el stack y realiza las comparaciones.
+; ------------------------------------------------------------
+start:
+	MOV SP, stackTop	   
+	CALL comparar_sensores
+    ;JMP boot (esto es para los "LEDs"
+	HLT				 
+
+; ------------------------------------------------------------
+; Subrutina: comparar_sensores
+; Compara los valores actuales de los sensores con los límites 
+; predefinidos.
+; Si un valor excede su límite, se activa una alerta (estado "ON"),
+; de lo contrario, se muestra el estado "OFF".
+; ------------------------------------------------------------
+comparar_sensores:
+	MOVB AL, [valor_direccion]   
+	CMPB AL, [sensor_direccion]
+    JBE .ESC_alertOFF
+	JBE .skip_ESC
+    JA .ESC_alertON
+    
+.skip_ESC:
+	MOVB AL, [valor_velocidad_lat]
+	CMPB AL, [sensor_velocidad_lat]
+    JBE .ESC_alertOFF
+	JBE .skip_ESC2      
+	JA .ESC_alertON
+    
+.skip_ESC2:
+	MOVB AL, [valor_temperatura]
+	CMPB AL, [sensor_temperatura]
+    JBE .SEN_alertOFF
+	JBE .skip_SEN         
+	JA .SEN_alertON 
+    
+.skip_SEN: 
+	MOVB AL, [valor_friccion]
+	CMPB AL, [sensor_friccion]
+    JBE .ABS_alertOFF
+	JBE .skip_ABS         
+	JA .ABS_alertON 
+    
+.skip_ABS:
+	MOVB AL, [valor_presion]
+	CMPB AL, [sensor_presion]
+    JBE .ABS_alertOFF
+	JBE .skip_ABS2       
+	JA .ABS_alertON 
+    
+.skip_ABS2:
+    MOVB AL, [valor_temp_motor]
+	CMPB AL, [sensor_temp_motor]
+    JBE .IYC_alertOFF
+	JBE .skip_IYC
+    JA .IYC_alertOn
+    
+.skip_IYC:
+	RET                   
+
+.ESC_alertON:
+    MOV C, ON_ESC       
+    MOV D, txtDisplay1    
+    CALL print
+    JBE .skip_ESC2
+    RET                                          
+
+.SEN_alertON:
+    MOV C, ON_SEN         
+    MOV D, txtDisplay2      
+    CALL print
+    JBE .skip_SEN 
+    RET
+
+.ABS_alertON:
+    MOV C, ON_ABS         
+    MOV D, txtDisplay3
+    CALL print
+    JBE .skip_ABS2
+    RET    
+
+.IYC_alertON:
+    MOV C, ON_IYC        
+    MOV D, txtDisplay4      
+    CALL print
+    JBE .skip_IYC
+    RET
+    
+.IYC_alertOn:
+    MOV C, ON_IYC        
+    MOV D, txtDisplay4      
+    CALL print
+    JBE .skip_IYC
+    RET
+
+.ESC_alertOFF:
+    MOV C, OFF_ESC         
+    MOV D, txtDisplay1     
+    CALL print
+    JBE .skip_ESC2
+    RET
+.SEN_alertOFF:
+    MOV C, OFF_SEN       
+    MOV D, txtDisplay2   
+    CALL print
+    JBE .skip_SEN
+    RET
+
+.ABS_alertOFF:
+    MOV C, OFF_ABS         
+    MOV D, txtDisplay3       
+    CALL print
+    JBE .skip_ABS2
+    RET                       
+               
+.IYC_alertOFF:
+    MOV C, OFF_IYC      
+    MOV D, txtDisplay4        
+    CALL print
+    JBE .skip_IYC
+    RET                
+
+; ------------------------------------------------------------
+; Subrutina 'print'
+; Imprime el contenido de las variables de salida en la dirección
+; de memoria especificada en D. Termina cuando encuentra un 0.
+; ------------------------------------------------------------
+print:                       
+    PUSH A                   
+    PUSH B                   
+    MOV B, 0                 
+
+.loop:
+    MOVB AL, [C]             
+    MOVB [D], AL             
+    INC C                    
+    INC D                    
+    CMPB BL, [C]             
+    JNZ .loop            
+
+    POP B                  
+    POP A                  
+    RET

@@ -1,0 +1,121 @@
+JMP start
+
+stackTop    EQU 0xFF    ; Definir el tope de la pila (SP inicial en 0xFF)
+txtDisplay  EQU 0x2E0   ; Dirección de memoria para el texto a mostrar
+
+; ------------------------------------------------------------
+; Variables de salida para los sistemas
+; Estas variables almacenan el estado actual de cada sistema.
+; Se inicializan en "F" (inactivo).
+; ------------------------------------------------------------
+output_ESC: DB "F"    ; Estado del sistema ESC (Estabilidad)
+output_SEN: DB "F"    ; Estado del sistema SEN (Enfriamiento)
+output_ABS: DB "F"    ; Estado del sistema ABS (Frenado)
+output_IYC: DB "F"    ; Estado del sistema IYC (Inyección de combustible)
+			DB 0      ; Fin de las variables de salida con un terminador de 0
+
+; ------------------------------------------------------------
+; Sensores y sus límites
+; Estos valores representan los límites de operación para cada sensor.
+; ------------------------------------------------------------
+sensor_direccion: DB 30     ; Límite para dirección (30 grados)
+sensor_velocidad_lat: DB 50 ; Límite para velocidad lateral (50 km/h)
+sensor_temperatura: DB 90   ; Límite para temperatura (90 °C)
+sensor_velocidad: DB 80     ; Límite para velocidad (80 km/h)
+sensor_friccion: DB 20      ; Límite para fricción (20%)
+sensor_presion: DB 50       ; Límite para presión (50 kPa)
+sensor_temp_motor: DB 100   ; Límite para temperatura del motor (100 °C)
+
+; ------------------------------------------------------------
+; Valores actuales de los sensores
+; Los valores reales de los sensores se compararán con los límites.
+; ------------------------------------------------------------
+valor_direccion: DB 30      ; Valor actual del sensor de dirección
+valor_velocidad_lat: DB 50  ; Valor actual del sensor de velocidad lateral
+valor_temperatura: DB 95    ; Valor actual del sensor de temperatura
+valor_velocidad: DB 80      ; Valor actual del sensor de velocidad
+valor_friccion: DB 25       ; Valor actual del sensor de fricción
+valor_presion: DB 50        ; Valor actual del sensor de presión
+valor_temp_motor: DB 100    ; Valor actual del sensor de temperatura del motor
+
+; ------------------------------------------------------------
+; Punto de inicio del programa
+; Configura el stack, realiza las comparaciones y llama a la función 'print'.
+; ------------------------------------------------------------
+start:
+	MOV SP, stackTop	     ; Inicializa el Stack Pointer (SP) en 0xFF
+	
+	; Llamar a la subrutina de comparación
+	CALL comparar_sensores
+	
+	; Luego imprimir los resultados
+	MOV C, output_ESC	     ; Carga la dirección de 'output_ESC' en C para imprimir
+	MOV D, txtDisplay	     ; Carga la dirección de 'txtDisplay' en D, donde se imprimirá el texto
+	CALL print		         ; Llama a la subrutina 'print' para mostrar el valor de 'output_ESC'
+	HLT				         ; Detiene el programa
+
+; ------------------------------------------------------------
+; Subrutina para comparar los valores de los sensores con los límites.
+; Si se supera el umbral de un sensor, se activará la alerta ("T").
+; ------------------------------------------------------------
+comparar_sensores:
+	; Comparación para el sistema ESC (dirección y velocidad lateral)
+	MOVB AL, [valor_direccion]   ; Accede al valor almacenado en la dirección de 'valor_direccion'
+	CMPB AL, [sensor_direccion]
+	JBE .skip_ESC         ; Si el valor de dirección es menor o igual al límite, saltar
+	MOVB [output_ESC], 'T' ; Si se supera el límite, activar la alerta ESC
+.skip_ESC:
+	MOVB AL, [valor_velocidad_lat]
+	CMPB AL, [sensor_velocidad_lat]
+	JBE .skip_ESC2        ; Si el valor de velocidad lateral es menor o igual al límite, saltar
+	MOVB [output_ESC], 'T' ; Si se supera el límite, activar la alerta ESC
+.skip_ESC2:
+
+	; Comparación para el sistema SEN (enfriamiento: temperatura)
+	MOVB AL, [valor_temperatura]
+	CMPB AL, [sensor_temperatura]
+	JBE .skip_SEN         ; Si el valor de temperatura es menor o igual al límite, saltar
+	MOVB [output_SEN], 'T' ; Si se supera el límite, activar la alerta SEN
+.skip_SEN:
+
+	; Comparación para el sistema ABS (frenado: fricción y presión)
+	MOVB AL, [valor_friccion]
+	CMPB AL, [sensor_friccion]
+	JBE .skip_ABS         ; Si el valor de fricción es menor o igual al límite, saltar
+	MOVB [output_ABS], 'T' ; Si se supera el límite, activar la alerta ABS
+.skip_ABS:
+	MOVB AL, [valor_presion]
+	CMPB AL, [sensor_presion]
+	JBE .skip_ABS2        ; Si el valor de presión es menor o igual al límite, saltar
+	MOVB [output_ABS], 'T' ; Si se supera el límite, activar la alerta ABS
+.skip_ABS2:
+
+	; Comparación para el sistema IYC (inyección de combustible: temperatura del motor)
+	MOVB AL, [valor_temp_motor]
+	CMPB AL, [sensor_temp_motor]
+	JBE .skip_IYC         ; Si el valor de temperatura del motor es menor o igual al límite, saltar
+	MOVB [output_IYC], 'T' ; Si se supera el límite, activar la alerta IYC
+.skip_IYC:
+
+	RET
+
+; ------------------------------------------------------------
+; Subrutina 'print'
+; Imprime el contenido de las variables de salida en la dirección
+; de memoria especificada en D. Termina cuando encuentra un 0.
+; ------------------------------------------------------------
+print:				
+	PUSH A                ; Guarda el registro A en la pila
+	PUSH B                ; Guarda el registro B en la pila
+	MOV B, 0              ; Inicializa B en 0 (para comparar el terminador)
+.loop:
+	MOVB AL, [C]          ; Carga el byte en la dirección de C en AL
+	MOVB [D], AL          ; Escribe el byte en la dirección de D
+	INC C                 ; Incrementa C para pasar al siguiente byte
+	INC D                 ; Incrementa D para pasar a la siguiente posición de salida
+	CMPB BL, [C]          ; Compara el siguiente byte en C con 0 (BL contiene 0)
+	JNZ .loop             ; Si no es 0, repite el ciclo
+	                     ; De lo contrario, termina el ciclo.
+	POP B                 ; Restaura el valor original de B
+	POP A                 ; Restaura el valor original de A
+	RET                   ; Retorna a la instrucción después de CALL

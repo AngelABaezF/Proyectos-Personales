@@ -68,3 +68,12 @@ select * from propertyforrent where rent = (select max(rent) from propertyforren
 select propertyNo from viewing where comment is null;
 select ownerNo from propertyforrent where propertyNo in(select propertyNo from viewing where comment is null);
 select fName, lName from privateowner where ownerNo in  (select ownerNo from propertyforrent where propertyNo in(select propertyNo from viewing where comment is null));
+
+-- Consultas de la tarea
+-- ¿Qué páginas contienen enlaces ftp a contenidos en la categoría N?
+-- ¿Qué páginas muestran imágenes (graphics) con el nombre 'asulogo'?
+-- ¿Qué páginas no muestran imágenes (graphics)?
+-- ¿Qué páginas usan imágenes jpg pero no gif?
+-- ¿Qué páginas contienen solo un enlace http a otra página?
+-- ¿Qué página tiene la mayor cantidad de visitas (hits)?
+-- ¿Qué páginas contienen enlaces ftp a contenidos en la categoría P?
