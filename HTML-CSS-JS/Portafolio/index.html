@@ -3,42 +3,229 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portafolio - Ángel Alexander Báez Flores</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Ángel Alexander | Portafolio</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron&display=swap" rel="stylesheet">
 </head>
 <body>
-    <section id="barra">
-        <header>
-            <nav>
-                <a href="#descripcion">Descripción</a>
-                <a href="#experiencia">Experiencia</a>
-                <a href="#certificaciones">Certificaciones & Reconocimientos</a>
-                <a href="#educacion">Educación</a>
-                <span></span>
-            </nav>
-        </header>
+    <header class="header">
+        <div class="logo">Ángel Alexander</div>
+        <nav>
+            <ul class="nav-links">
+                <li><a href="#about">Sobre Mí</a></li>
+                <li><a href="#projects">Proyectos</a></li>
+                <li><a href="#contact">Contacto</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <h1>Ángel Alexander Báez Flores</h1>
+        <h2>Desarrollador Full-Stack</h2>
+        <p>“Si decides hacer solo las cosas que sabes que van a funcionar, dejarás un montón de oportunidades encima de la mesa”. Jeff Bezos</p>
     </section>
 
-    <section class="profile">
-        <div class="profile-pic">
-            <img src="img/foto_perfil.jpg" alt="Ángel Alexander Báez Flores">
+    <section id="about" class="about">
+        <div class="container1">
+            <div class="avatar">
+                <a href="https://www.linkedin.com/in/ángel-alexander-báez-flores" target="_blank">
+                    <img src="img/foto_perfil.jpg" alt="Ángel Alexander" />
+                </a>
+            </div>
         </div>
-        <div class="description">
-            <p>"Aquí va mi descripción"</p>
+        <h2>Sobre Mí</h2>
+        <p>“Soy un desarrollador fullstack con una sólida formación académica y una experiencia práctica diversa. Actualmente, estoy cursando la Ingeniería en Tecnologías Computacionales en el Tecnológico de Monterrey, complementando mi título como Técnico en Programación. Mis habilidades técnicas están respaldadas por certificaciones en diversas áreas y he demostrado mi capacidad para enfrentar desafíos complejos y trabajar eficientemente bajo presión a través de mi participación en Hackáthones.”</p>
+        <br>
+        <h2>Linea de Tiempo</h2>
+        <p>Selecciona una opcion para visualizar la liena de tiempo</p>
+
+        <div class="timeline-horizontal">
+            <div class="timeline-point" data-info="education">
+                <div class="tooltip">Educación</div>
+            </div>
+            <div class="timeline-point" data-info="certifications">
+                <div class="tooltip">Certificados</div>
+            </div>
+            <div class="timeline-point" data-info="awards">
+                <div class="tooltip">Reconocimientos</div>
+            </div>
+        </div>
+        
+        <div class="timeline-info" id="education">
+            <h3>Educación</h3>
+            <p><strong>Tecnológico de Monterrey</strong> – Ingeniería en Tecnologías Computacionales<br><em>2021 - Presente</em></p>
+            <p><strong>CECYTE</strong> – Técnico en Programación<br><em>2017 - 2021</em></p>
+        </div>
+
+        <div class="timeline-info" id="certifications">
+            <h3>Certificados</h3>
+            <p><strong>Fundación Carlos Slim</strong> – Certificado de Frontend<br><em>2020</em></p>
+            <p><strong>Fundación Carlos Slim</strong> – Certificado de Backend<br><em>2020</em></p>
+        </div>
+
+        <div class="timeline-info" id="awards">
+            <h3>Reconocimientos</h3>
+            <p><strong>Hackathones Nacionales</strong> – Participante destacado<br><em>2022</em></p>
         </div>
     </section>
-    <footer>
-        <div class="footer-icons">
-            <a href="https://github.com/AngelABaezF/Proyectos-Personales" target="_blank">
-                <img src="img/github.png" alt="GitHub">
-            </a>
-            <a href="https://linkedin.com/in/ángel-alexander-báez-flores" target="_blank">
-                <img src="img/linkedin.png" alt="LinkedIn">
-            </a>
-            <a href="mailto:angel.alexanderbaezflores@gmail.com">
-                <img src="img/gmail.png" alt="Correo">
-            </a>
+
+    <div class="container">
+        <div class="square black">
+        <div class="square">
+        <div class="square black">
+        <div class="square">
+        <div class="square black">
+        <div class="square">
+        <div class="square black">
+        <div class="square">
+        <div class="square black">
+        <div class="square">
+        <div class="square black">
+        <div class="square">
+        <div class="square black">
+        <div class="square">
+        <div class="square black">
+        <div class="square">
+        <div class="square black">
+        <div class="square">
+        <div class="square black">
+        <div class="square">
+        <div class="square black">
+        <div class="square">
+        <div class="square black">
+        <div class="square">
+        <div class="square black">
+        <div class="square">
+        <div class="square black">
+        <div class="square">
+        <div class="square black">
         </div>
+        </div>
+        </div>
+        </div>
+        </div>
+        </div>
+        </div>
+        </div>
+        </div>
+        </div>
+        </div>
+        </div>
+        </div>
+        </div>
+        </div>
+        </div>
+        </div>
+        </div>
+        </div>
+        </div>
+        </div>
+        </div>
+        </div>
+        </div>
+        </div>
+        </div>
+        </div>
+        </div>
+        </div>
+        </div>
+
+    <section id="projects" class="projects">
+        <h2>Proyectos</h2>
+    
+        <!-- Filtros -->
+        <div class="filters">
+            <button onclick="filterProjects('all')">Todos</button>
+            <button onclick="filterProjects('c++')">C++</button>
+            <button onclick="filterProjects('web')">Web (HTML, CSS, JS, PHP)</button>
+            <button onclick="filterProjects('python')">Python</button>
+            <button onclick="filterProjects('ensamblador')">Ensamblador</button>
+            <button onclick="filterProjects('matlab')">MATLAB</button>
+        </div>
+    
+        <!-- Sección de los más nuevos -->
+        <h3>Más Nuevos</h3>
+        <div class="projects-container filter-section" id="new-projects">
+            <div class="project-card c++">
+                <div class="card-image">
+                    <img src="https://via.placeholder.com/400x300" alt="Proyecto C++">
+                </div>
+                <div class="card-content">
+                    <h3>Proyecto en C++</h3>
+                    <p>Implementación de estructuras de datos avanzadas en C++.</p>
+                    <a href="#" class="button">Ver Proyecto</a>
+                </div>
+            </div>
+            
+            <div class="project-card web">
+                <div class="card-image">
+                    <img src="img/portafolio.png" alt="Proyecto Web">
+                </div>
+                <div class="card-content">
+                    <h3>Sitio Web Portafolio</h3>
+                    <p>Desarrollo de un sitio web con HTML, CSS y JS.</p>
+                    <a href="#" class="button">Ver Proyecto</a>
+                </div>
+            </div>
+        </div>
+    
+        <!-- Sección de los más importantes -->
+        <h3>Más Importantes</h3>
+        <div class="projects-container filter-section" id="important-projects">
+            <div class="project-card python">
+                <div class="card-image">
+                    <img src="https://via.placeholder.com/400x300" alt="Proyecto Python">
+                </div>
+                <div class="card-content">
+                    <h3>Proyecto Python</h3>
+                    <p>Automatización de procesos utilizando Python y análisis de datos.</p>
+                    <a href="#" class="button">Ver Proyecto</a>
+                </div>
+            </div>
+            
+            <div class="project-card ensamblador">
+                <div class="card-image">
+                    <img src="https://via.placeholder.com/400x300" alt="Proyecto Ensamblador">
+                </div>
+                <div class="card-content">
+                    <h3>Proyecto Ensamblador</h3>
+                    <p>Simulador de ensamblador para monitorear sistemas críticos de vehículos.</p>
+                    <a href="#" class="button">Ver Proyecto</a>
+                </div>
+            </div>
+        </div>
+    </section>
+        
+
+    <section id="contact" class="contact">
+        <h2>Contacto</h2>
+        <p>Si tienes algún proyecto interesante o deseas colaborar, ¡no dudes en contactarme!</p>
+    </section>
+
+    <div class="letter-image">
+        <a href="mailto:angel.alexanderbaezflores@gmail.com">
+            <div class="animated-mail">
+                <div class="back-fold"></div>
+                <div class="letter">
+                    <div class="letter-border"></div>
+                    <div class="letter-title"></div>
+                    <div class="letter-context"></div>
+                    <div class="letter-stamp">
+                        <div class="letter-stamp-inner"></div>
+                    </div>
+                </div>
+                <div class="top-fold"></div>
+                <div class="body"></div>
+                <div class="left-fold"></div>
+            </div>
+            <div class="shadow"></div>
+        </a>
+    </div>
+
+    <footer class="footer">
+        <p>© 2024 Ángel Alexander Báez Flores. Todos los derechos reservados.</p>
     </footer>
+
+    <script src="app.js"></script>
 </body>
 </html>
