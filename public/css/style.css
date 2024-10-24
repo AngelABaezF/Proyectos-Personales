@@ -438,13 +438,13 @@ animation: rotate 10s infinite linear;
 		.letter-border {
 			height: 10px;
 			width: 100%;
-      background: repeating-linear-gradient(
-        -45deg,
-        #c2156c,
-        #c2156c 8px,
-        transparent 8px,
-        transparent 18px
-      );
+            background: repeating-linear-gradient(
+                -45deg,
+                #c2156c,
+                #c2156c 8px,
+                transparent 8px,
+                transparent 18px
+            );
 		}
 		
 		.letter-title {
