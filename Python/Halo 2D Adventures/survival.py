@@ -10,11 +10,41 @@ def juego():
     
     musica_survival = pygame.mixer.Sound("sonidos/survival.mp3")
     musica_survival.play()
+    pistola = pygame.mixer.Sound("sonidos/pistola.mp3")
+    
+    salud=100
 
     #Cargamos los sprites
     #Background
     background = pygame.image.load("imagenes/backgroundSurvival.png")
     background = pygame.transform.scale(background, (800,600))
+    
+    disparo = pygame.image.load("imagenes/fuego_disparo_1.png")
+    disparo = pygame.transform.scale(disparo, (30, 20))
+    disparo2 = pygame.image.load("imagenes/fuego_disparo_2.png")
+    disparo2 = pygame.transform.scale(disparo2, (30, 20))
+    bola_de_plasma_2 = pygame.image.load("imagenes/bola_plasma_2.png")
+    bola_de_plasma_2 = pygame.transform.scale(bola_de_plasma_2, (30,20))
+    bola_de_plasma_3 = pygame.image.load("imagenes/bola_plasma_3.png")
+    bola_de_plasma_3 = pygame.transform.scale(bola_de_plasma_3, (30,20))
+    vida1 = pygame.image.load("imagenes/vidas/vidas_1.png")
+    vida1 = pygame.transform.scale(vida1, (200,50))
+    vida2 = pygame.image.load("imagenes/vidas/vidas_2.png")
+    vida2 = pygame.transform.scale(vida2, (200,50))
+    vida3 = pygame.image.load("imagenes/vidas/vidas_3.png")
+    vida3 = pygame.transform.scale(vida3, (200,50))
+    vida4 = pygame.image.load("imagenes/vidas/vidas_4.png")
+    vida4 = pygame.transform.scale(vida4, (200,50))
+    vida5 = pygame.image.load("imagenes/vidas/vidas_5.png")
+    vida5 = pygame.transform.scale(vida5, (200,50))
+    vida6 = pygame.image.load("imagenes/vidas/vidas_6.png")
+    vida6 = pygame.transform.scale(vida6, (200,50))
+    vida7 = pygame.image.load("imagenes/vidas/vidas_7.png")
+    vida7 = pygame.transform.scale(vida7, (200,50))
+    vida8 = pygame.image.load("imagenes/vidas/vidas_8.png")
+    vida8 = pygame.transform.scale(vida8, (200,50))
+    vida9 = pygame.image.load("imagenes/vidas/vidas_9.png")
+    vida9 = pygame.transform.scale(vida9, (200,50))
 
     #Funcion para cargar una lista de imagenes para animaciones.
     def cargar_imagenes(prefijo, sufijo, n, escala):
@@ -107,9 +137,7 @@ def juego():
     frecuencia_disparo = 10  # Puedes ajustar esta frecuencia según tus preferencias
 
     # Velocidad del cuadrado rojo
-    cuadrado_rojo_velocidad = 2  # Ajusta esta velocidad según lo que desees
-    
-    salud = 100
+    cuadrado_rojo_velocidad = 1  # Ajusta esta velocidad según lo que desees
 
     def actualizar_cuadrado_salto():
         nonlocal cuadrado_y, saltando, salto_contador, actualizar_agachado
@@ -137,7 +165,7 @@ def juego():
     # Función para actualizar la posición horizontal
     def actualizar_cuadrado_horizontal():
         nonlocal cuadrado_x
-        if moverse_derecha and cuadrado_x < 475:
+        if moverse_derecha and cuadrado_x < 800:
             cuadrado_x += cuadrado_velocidad
         if moverse_izquierda and cuadrado_x > 0:
             cuadrado_x -= cuadrado_velocidad
@@ -152,9 +180,10 @@ def juego():
     # Función para disparar hacia el cursor
     def disparar_hacia_cursor():
         cursor_x, cursor_y = pygame.mouse.get_pos()
-        delta_x = cursor_x - cuadrado_x
+        delta_x = cursor_x - cuadrado_x + cuadrado_tamaño
         delta_y = cursor_y - cuadrado_y
         distancia = math.sqrt(delta_x ** 2 + delta_y ** 2)
+        pistola.play()
         if distancia == 0:
             return
 
@@ -162,12 +191,19 @@ def juego():
         velocidad_y = (delta_y / distancia) * velocidad_disparo
 
         # Condicional para el origen del disparo (si esta agachado)
-        if not actualizar_agachado:
-            nuevo_disparo = {'x': cuadrado_x + cuadrado_tamaño/4, 'y': cuadrado_y + cuadrado_tamaño / 2,
+        if not moverse_izquierda :
+            nuevo_disparo = {'x': cuadrado_x + cuadrado_tamaño, 'y': cuadrado_y + 13,
                               'velocidad_x': velocidad_x, 'velocidad_y': velocidad_y}
-        elif actualizar_agachado:
-            nuevo_disparo = {'x': cuadrado_x + cuadrado_tamaño/4, 'y': cuadrado_y + cuadrado_tamaño / 4,
+            pantalla.blit(disparo, (cuadrado_x + cuadrado_tamaño, cuadrado_y + 13))
+            print("!!")
+        elif moverse_izquierda and moverse_derecha:
+            nuevo_disparo = {'x': cuadrado_x + cuadrado_tamaño, 'y': cuadrado_y + 13,
                               'velocidad_x': velocidad_x, 'velocidad_y': velocidad_y}
+        elif moverse_izquierda:
+            nuevo_disparo = {'x': cuadrado_x , 'y': cuadrado_y + 13,
+                              'velocidad_x': velocidad_x, 'velocidad_y': velocidad_y}
+            
+
         projectiles.append(nuevo_disparo)
 
     
@@ -175,7 +211,8 @@ def juego():
         def __init__(self, x, y):
             self.x = x
             self.y = y
-            self.size = 100
+            self.ancho = 50
+            self.alto = 100
             self.color = (255, 0, 0)
             self.colisiones = 0
 
@@ -200,7 +237,8 @@ def juego():
         def __init__(self, x, y):
             self.x = x
             self.y = y
-            self.size = 100
+            self.ancho = 50
+            self.alto = 100
             self.color = (255, 0, 0)
             self.colisiones = 0
 
@@ -273,6 +311,7 @@ def juego():
                     actualizar_agachado = False  # Cuando se suelta S, volver a altura normal
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and not automatico:
                 # Disparar cuando se hace clic izquierdo hacia el cursor
+                pantalla.blit(disparo, (300,400))
                 disparar_hacia_cursor()
                 if 360 <= event.pos[0] <= 410 and 10 <= event.pos[1] <= 50:
                     # Hacer clic en el botón de salida
@@ -292,10 +331,16 @@ def juego():
         # Actualizar la posición de los cuadrados rojos
         for cuadrado_rojo in cuadrados_rojos:
             cuadrado_rojo.x -= cuadrado_rojo_velocidad
+            if cuadrado_rojo.x == cuadrado_x:
+                salud -= 49
+                continue
 
         # Actualizar la posición de los cuadrados azules
         for cuadrado_derecho in cuadrados_azules:
             cuadrado_derecho.x += cuadrado_rojo_velocidad / 2  # Se mueve más lentamente que los rojos
+            if cuadrado_derecho.x == cuadrado_x:
+                salud -= 49
+                continue
 
         # Incrementar el temporizador de disparo
         if temporizador_disparo < frecuencia_disparo:
@@ -304,14 +349,14 @@ def juego():
         # Eliminar cuadrados rojos si han sido alcanzados por 5 balas
         for i, cuadrado_rojo in enumerate(cuadrados_rojos):
             for j, projectil in enumerate(projectiles):
-                if cuadrado_rojo and cuadrado_rojo.x < projectil['x'] < cuadrado_rojo.x + cuadrado_rojo.size and cuadrado_rojo.y < projectil['y'] < cuadrado_rojo.y + cuadrado_rojo.size:
+                if cuadrado_rojo and cuadrado_rojo.x < projectil['x'] < cuadrado_rojo.x + cuadrado_rojo.ancho and cuadrado_rojo.y < projectil['y'] < cuadrado_rojo.y + cuadrado_rojo.alto:
                     cuadrado_rojo.colisionar()
                     del projectiles[j]
 
         # Incrementar el contador de cuadrados rojos eliminados
         for cuadrado_rojo in cuadrados_rojos:
             if cuadrado_rojo.eliminar():
-                cuadrados_rojos_eliminados += 5
+                cuadrados_rojos_eliminados += 1
 
         # Eliminar los cuadrados rojos que han sido alcanzados por 5 balas
         cuadrados_rojos = [cuadrado_rojo for cuadrado_rojo in cuadrados_rojos if not cuadrado_rojo.eliminar()]
@@ -319,25 +364,24 @@ def juego():
         # Eliminar cuadrados azules si han sido alcanzados por 5 balas
         for i, cuadrado_derecho in enumerate(cuadrados_azules):
             for j, projectil in enumerate(projectiles):
-                if cuadrado_derecho and cuadrado_derecho.x < projectil['x'] < cuadrado_derecho.x + cuadrado_derecho.size and cuadrado_derecho.y < projectil['y'] < cuadrado_derecho.y + cuadrado_derecho.size:
+                if cuadrado_derecho and cuadrado_derecho.x < projectil['x'] < cuadrado_derecho.x + cuadrado_derecho.ancho and cuadrado_derecho.y < projectil['y'] < cuadrado_derecho.y + cuadrado_derecho.alto:
                     cuadrado_derecho.colisionar()
                     del projectiles[j]
-                    salud-= 49  # Reducir la salud del personaje en 49 puntos
 
         # Incrementar el contador de cuadrados azules eliminados
         for cuadrado_derecho in cuadrados_azules:
             if cuadrado_derecho.eliminar():
-                cuadrados_azules_eliminados += 5
+                cuadrados_azules_eliminados += 1
 
         # Eliminar los cuadrados azules que han sido alcanzados por 5 balas
         cuadrados_azules = [cuadrado_derecho for cuadrado_derecho in cuadrados_azules if not cuadrado_derecho.eliminar()]
 
         # Generar nuevos cuadrados rojos de forma aleatoria
-        if random.randint(1, 120) == 1:
+        if random.randint(1, 100) == 1:
             generar_cuadrado_rojo()
 
         # Generar nuevos cuadrados azules de forma aleatoria
-        if random.randint(1, 120) == 1:
+        if random.randint(1, 100) == 1:
             generar_cuadrado_derecho()
 
         # Actualizar posición del cuadrado si está saltando
@@ -372,11 +416,23 @@ def juego():
             pantalla.blit(jefe_normal_agachado, (cuadrado_x, cuadrado_y))
             
         # Boton de salida
-        pygame.draw.rect(pantalla, white, (360, 10, 50, 40))
+        pygame.draw.rect(pantalla, (200,200,200), (360, 10, 50, 40))
 
         # Dibujar los proyectiles
         for projectil in projectiles:
-            pygame.draw.rect(pantalla, white, (projectil['x'], projectil['y'], 5, 5))
+            if math.sqrt((projectil['x'] - cuadrado_x)**2 + (projectil['y'] - cuadrado_y)**2)< 75 and moverse_izquierda and moverse_derecha:
+                pantalla.blit(disparo, (cuadrado_x + cuadrado_tamaño,cuadrado_y ))
+                print(math.sqrt((projectil['x'] - cuadrado_x)**2 + (projectil['y'] - cuadrado_y)**2))
+            elif math.sqrt((projectil['x'] - cuadrado_x)**2 + (projectil['y'] - cuadrado_y)**2)< 75 and moverse_derecha:
+                pantalla.blit(disparo, (cuadrado_x + cuadrado_tamaño,cuadrado_y ))
+                print(math.sqrt((projectil['x'] - cuadrado_x)**2 + (projectil['y'] - cuadrado_y)**2))
+            elif math.sqrt((projectil['x'] - cuadrado_x)**2 + (projectil['y'] - cuadrado_y)**2)< 75 and not moverse_derecha and not moverse_izquierda:
+                pantalla.blit(disparo, (cuadrado_x + cuadrado_tamaño,cuadrado_y ))
+                print(math.sqrt((projectil['x'] - cuadrado_x)**2 + (projectil['y'] - cuadrado_y)**2))
+            elif math.sqrt((projectil['x'] - cuadrado_x)**2 + (projectil['y'] - cuadrado_y)**2)< 75 and moverse_izquierda :
+                pantalla.blit(disparo2, (cuadrado_x - 29 ,cuadrado_y ))
+                print(math.sqrt((projectil['x'] - cuadrado_x)**2 + (projectil['y'] - cuadrado_y)**2))
+            pygame.draw.circle(pantalla, (212,175,55), (projectil['x'], projectil['y']), 2)
 
         # Dibujar los cuadrados rojos
         for cuadrado_rojo in cuadrados_rojos:
@@ -385,21 +441,42 @@ def juego():
         # Dibujar los cuadrados azules
         for cuadrado_derecho in cuadrados_azules:
             cuadrado_derecho.draw(pantalla)
+        
+        if salud == 100:
+            pantalla.blit(vida9, (10,40))
+        elif salud>83:
+            pantalla.blit(vida8, (10,40))
+        elif salud>67:
+            pantalla.blit(vida7, (10,40))
+        elif salud>51:
+            pantalla.blit(vida6, (10,40))
+        elif salud>40:
+            pantalla.blit(vida5, (10,40))
+        elif salud>30:
+            pantalla.blit(vida4, (10,40))
+        elif salud>20:
+            pantalla.blit(vida3, (10,40))
+        elif salud>10:
+            pantalla.blit(vida2, (10,40))
+        elif salud>0:
+            pantalla.blit(vida1, (10,40))
+        elif salud<=0:
+            musica_nivel.stop()
+            import derrota
+            derrota.victoria()
 
         # Mostrar el contador de cuadrados rojos eliminados
         marcador_rojo = font.render(f'Puntos: {cuadrados_rojos_eliminados+cuadrados_azules_eliminados}', True, black)
         pantalla.blit(marcador_rojo, (650, 10))
         
-        marcador_salud = font.render(f'Salud: {salud}', True, black)
-        pantalla.blit(marcador_salud, (10, 10))
+        # Mostrar el contador de cuadrados rojos eliminados
+        vida = font.render(f'Salud: {salud}', True, black)
+        pantalla.blit(vida, (10, 10))
 
         # Actualizar la pantalla
         pygame.display.update()
         pygame.time.delay(15)
 
-    # Contador de cuadrados rojos eliminados
-    cuadrados_rojos_eliminados = 0
-    
     # Finalizar Pygame
     pygame.quit()
     sys.exit()

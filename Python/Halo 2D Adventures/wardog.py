@@ -4,12 +4,10 @@ import math
 import random
 import time
 
-
 def juego():
     # Inicialización de Pygame
     pygame.init()
     musica_wardog = pygame.mixer.Sound("sonidos/wardog.mp3")
-
     
     musica_wardog.play()
 
@@ -17,6 +15,16 @@ def juego():
     #Background
     background = pygame.image.load("imagenes/backgroundWardog.png")
     background = pygame.transform.scale(background, (800,600))
+    
+    pelican = pygame.image.load("imagenes/pelican_mini.png")
+    pelican = pygame.transform.scale(pelican, (250, 150))
+    pelican_x = 0
+    pelican_ancho = 250
+    pelican_golpes = 0
+    
+    disparo = pygame.image.load("imagenes/disparo_3.png")
+    disparo = pygame.transform.scale(disparo, (20, 30))
+
         
 
     
@@ -35,6 +43,7 @@ def juego():
         
     warthog = cargar_imagenes("imagenes/warthog/warthog_", ".png", 4, (200,100))
     banshee = cargar_imagenes("imagenes/banshee_b/banshee_", ".png", 3, (110,50))
+    explosion = cargar_imagenes("imagenes/explosion/explosion_",".png", 7, (50,100))
     
     # Dimensiones de la pantalla
     pantalla_ancho = 800
@@ -76,13 +85,15 @@ def juego():
     # Disparo
     velocidad_disparo = 5
     projectiles = []
+    salida_disparo_x, salida_disparo_y = 80, 500
+
 
     # Variable para rastrear si el botón derecho del ratón está presionado
     boton_derecho_presionado = False
 
     # Temporizador para controlar la frecuencia de los disparos
     temporizador_disparo = 0
-    frecuencia_disparo = 10  # Puedes ajustar esta frecuencia según tus preferencias
+    frecuencia_disparo = 7  # Puedes ajustar esta frecuencia según tus preferencias
 
     # Velocidad del cuadrado rojo
     cuadrado_rojo_velocidad = 1  # Ajusta esta velocidad según lo que desees
@@ -97,8 +108,8 @@ def juego():
     # Función para disparar hacia el cursor
     def disparar_hacia_cursor():
         cursor_x, cursor_y = pygame.mouse.get_pos()
-        delta_x = cursor_x - cuadrado_x
-        delta_y = cursor_y - cuadrado_y
+        delta_x = cursor_x - salida_disparo_x
+        delta_y = cursor_y - salida_disparo_y
         distancia = math.sqrt(delta_x ** 2 + delta_y ** 2)
         if distancia == 0:
             return
@@ -107,7 +118,7 @@ def juego():
         velocidad_y = (delta_y / distancia) * velocidad_disparo
 
 
-        nuevo_disparo = {'x': cuadrado_x + 100, 'y': 495,
+        nuevo_disparo = {'x': salida_disparo_x, 'y': salida_disparo_y,
                               'velocidad_x': velocidad_x, 'velocidad_y': velocidad_y}
         projectiles.append(nuevo_disparo)
 
@@ -116,7 +127,8 @@ def juego():
             self.x = x
             self.y = 150
             cuadrado_rojo_velocidad = 1
-            self.size = 75
+            self.alto = 50
+            self.ancho = 75
             self.color = (255, 0, 0)
             self.colisiones = 0
 
@@ -124,10 +136,10 @@ def juego():
             mostrar_animacion(3, banshee, self.x, self.y)
 
         def colisionar(self):
-            self.colisiones += 1
+                self.colisiones += 1
 
         def eliminar(self):
-            return self.colisiones >= 5
+            return self.colisiones >= 10
 
     # Lista para almacenar los cuadrados rojos
     cuadrados_rojos = []
@@ -189,15 +201,24 @@ def juego():
 
         # Eliminar cuadrados rojos si han sido alcanzados por 5 balas
         for i, cuadrado_rojo in enumerate(cuadrados_rojos):
+            if cuadrado_rojo.x <= pelican_x + pelican_ancho:
+                cuadrado_rojo.colisionar()
             for j, projectil in enumerate(projectiles):
-                if cuadrado_rojo and cuadrado_rojo.x < projectil['x'] < cuadrado_rojo.x + cuadrado_rojo.size and cuadrado_rojo.y < projectil['y'] < cuadrado_rojo.y + cuadrado_rojo.size:
+                if cuadrado_rojo and cuadrado_rojo.x < projectil['x'] < cuadrado_rojo.x + cuadrado_rojo.ancho and cuadrado_rojo.y < projectil['y'] < cuadrado_rojo.y + cuadrado_rojo.alto:
                     cuadrado_rojo.colisionar()
                     del projectiles[j]
 
+
         # Incrementar el contador de cuadrados rojos eliminados
         for cuadrado_rojo in cuadrados_rojos:
-            if cuadrado_rojo.eliminar():
+            if cuadrado_rojo.eliminar() and cuadrado_rojo.x > 250:
                 cuadrados_rojos_eliminados += 1
+            elif cuadrado_rojo.eliminar() and cuadrado_rojo.x <= 250:
+                pelican_golpes += 1
+            if cuadrados_rojos_eliminados == 15:
+                musica_wardog.stop()
+                import victoria
+                victoria.victoria()
 
         # Eliminar los cuadrados rojos que han sido alcanzados por 5 balas
         cuadrados_rojos = [cuadrado_rojo for cuadrado_rojo in cuadrados_rojos if not cuadrado_rojo.eliminar()]
@@ -233,23 +254,32 @@ def juego():
 
         # Dibujar los proyectiles
         for projectil in projectiles:
-            pygame.draw.rect(pantalla, white, (projectil['x'], projectil['y'], 5, 5))
+            if math.sqrt((projectil['x'] - salida_disparo_x)**2 + (projectil['y'] - 540)**2)< 75:
+                pantalla.blit(disparo, (salida_disparo_x-4, salida_disparo_y - 33 ))
+            pygame.draw.circle(pantalla, (212,175,55), (projectil['x'], projectil['y']), 2)
 
         # Dibujar los cuadrados rojos
         for cuadrado_rojo in cuadrados_rojos:
             cuadrado_rojo.draw(pantalla)
+            
+        if pelican_golpes < 6:
+            pantalla.blit(pelican, (pelican_x,75))
+        else:
+            musica_wardog.stop()
+            import derrota
+            derrota.victoria()
+        print(pelican_golpes)
+        
+
 
         # Mostrar el contador de cuadrados rojos eliminados
         marcador = font.render(f'Puntos: {cuadrados_rojos_eliminados}', True, white)
-        pantalla.blit(marcador, (650, 10))
+        pantalla.blit(marcador, (10, 10))
 
         # Actualizar la pantalla
         pygame.display.update()
         pygame.time.delay(15)
 
-    # Contador de cuadrados rojos eliminados
-    cuadrados_rojos_eliminados = 0
-    
     # Finalizar Pygame
     pygame.quit()
     sys.exit()

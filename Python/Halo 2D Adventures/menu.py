@@ -4,6 +4,7 @@ import sys
 # Inicialización de Pygame
 pygame.init()
 
+
 #Cargamos los sprites
 #Background
 background = pygame.image.load("imagenes/menu.jpeg")
@@ -14,6 +15,7 @@ musica_menu = pygame.mixer.Sound("sonidos/menu.mp3")
 # Dimensiones de la pantalla
 pantalla_ancho = 800
 pantalla_alto = 600
+
 
 # Colores
 black = (0, 0, 0)
@@ -45,6 +47,8 @@ rectangulo3_y = centro_y - rectangulo_alto // 2 + 150
 def menu():
     running = True
     musica_menu.play()
+    font = pygame.font.Font(None, 36)
+
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -75,9 +79,21 @@ def menu():
         pygame.draw.rect(pantalla, black, (rectangulo1_x, rectangulo1_y, rectangulo_ancho, rectangulo_alto), 2)
         pygame.draw.rect(pantalla, black, (rectangulo2_x, rectangulo2_y, rectangulo_ancho, rectangulo_alto), 2)
         pygame.draw.rect(pantalla, black, (rectangulo3_x, rectangulo3_y, rectangulo_ancho, rectangulo_alto), 2)
+        
+        sobrevive = font.render(f'Sobrevive', True, (0,0,0))
+        pantalla.blit(sobrevive, (pantalla_ancho/2-60, pantalla_alto/2+138))
+        
+        defiende = font.render(f'Defiende', True, (0,0,0))
+        pantalla.blit(defiende, (pantalla_ancho/2-50, pantalla_alto/2+25))
+        defiende2 = font.render(f'al pelican', True, (0,0,0))
+        pantalla.blit(defiende2, (pantalla_ancho/2-50, pantalla_alto/2+45))
 
+        elimina = font.render(f'Elimina', True, (0,0,0))
+        pantalla.blit(elimina, (pantalla_ancho/2-45, pantalla_alto/2-60))
+        
         # Actualizar la pantalla
         pygame.display.update()
+
 
     # Finalizar Pygame
     pygame.quit()

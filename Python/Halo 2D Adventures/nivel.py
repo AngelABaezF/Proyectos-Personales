@@ -6,11 +6,13 @@ import time
 
 #Definimos todo el nivel como funcion para poder ejecutarlo desde el menu
 def juego():
-    global x, y, disparos_g
+    #Salud
+    salud=100
     # Inicialización de Pygame
     pygame.init()
     musica_nivel = pygame.mixer.Sound("sonidos/nivel.mp3")
     musica_nivel.play()
+    pistola = pygame.mixer.Sound("sonidos/pistola.mp3")
     
     # Bucle principal del juego
     running = True
@@ -22,14 +24,35 @@ def juego():
     xbackground1 = 0
     xbackground2 = 800
     
-    musica = pygame
-    
+    disparo = pygame.image.load("imagenes/fuego_disparo_1.png")
+    disparo = pygame.transform.scale(disparo, (30, 20))
+    disparo2 = pygame.image.load("imagenes/fuego_disparo_2.png")
+    disparo2 = pygame.transform.scale(disparo2, (30, 20))
+    bola_de_plasma_2 = pygame.image.load("imagenes/bola_plasma_2.png")
+    bola_de_plasma_2 = pygame.transform.scale(bola_de_plasma_2, (30,20))
+    vida1 = pygame.image.load("imagenes/vidas/vidas_1.png")
+    vida1 = pygame.transform.scale(vida1, (200,50))
+    vida2 = pygame.image.load("imagenes/vidas/vidas_2.png")
+    vida2 = pygame.transform.scale(vida2, (200,50))
+    vida3 = pygame.image.load("imagenes/vidas/vidas_3.png")
+    vida3 = pygame.transform.scale(vida3, (200,50))
+    vida4 = pygame.image.load("imagenes/vidas/vidas_4.png")
+    vida4 = pygame.transform.scale(vida4, (200,50))
+    vida5 = pygame.image.load("imagenes/vidas/vidas_5.png")
+    vida5 = pygame.transform.scale(vida5, (200,50))
+    vida6 = pygame.image.load("imagenes/vidas/vidas_6.png")
+    vida6 = pygame.transform.scale(vida6, (200,50))
+    vida7 = pygame.image.load("imagenes/vidas/vidas_7.png")
+    vida7 = pygame.transform.scale(vida7, (200,50))
+    vida8 = pygame.image.load("imagenes/vidas/vidas_8.png")
+    vida8 = pygame.transform.scale(vida8, (200,50))
+    vida9 = pygame.image.load("imagenes/vidas/vidas_9.png")
+    vida9 = pygame.transform.scale(vida9, (200,50))
+        
     # Dimensiones de la pantalla
     pantalla_ancho = 800
     pantalla_alto = 600
     pantalla = pygame.display.set_mode((pantalla_ancho, pantalla_alto))
-    
-    salud = 100
     
     #Funcion para cargar una lista de imagenes para animaciones.
     def cargar_imagenes(prefijo, sufijo, n, escala):
@@ -115,25 +138,20 @@ def juego():
     # Disparo
     velocidad_disparo = 5
     projectiles = []
-    
-    # Lista para almacenar los disparos_g
-    disparos_g = []
 
     # Variable para rastrear si el botón derecho del ratón está presionado
     boton_derecho_presionado = False
-    
-    # Reloj para controlar la velocidad del juego
-    clock = pygame.time.Clock()
 
     # Temporizador para controlar la frecuencia de los disparos
     temporizador_disparo = 0
-    frecuencia_disparo = 10  # Puedes ajustar esta frecuencia según tus preferencias
+    frecuencia_disparo = 8  # Puedes ajustar esta frecuencia según tus preferencias
 
     #====Datos de los enemigos====#
     # Velocidad del cuadrado rojo
     elite_amarillo_velocidad = 1  # Ajusta esta velocidad según lo que desees
     grunt_velocidad = 1
     jakal_velocidad = 1
+
 
     #====Funciones del personaje====#
     # Función para actualizar la posición del personaje si está saltando
@@ -163,7 +181,7 @@ def juego():
     # Función para actualizar la posición horizontal del personaje
     def actualizar_cuadrado_horizontal():
         nonlocal cuadrado_x
-        if moverse_derecha and cuadrado_x <= 450:
+        if moverse_derecha and cuadrado_x <= 475:
             cuadrado_x += cuadrado_velocidad
 
         if moverse_izquierda and cuadrado_x > 0:
@@ -183,6 +201,7 @@ def juego():
         delta_x = cursor_x - cuadrado_x
         delta_y = cursor_y - cuadrado_y
         distancia = math.sqrt(delta_x ** 2 + delta_y ** 2)
+        pistola.play()
         if distancia == 0:
             return
 
@@ -190,19 +209,19 @@ def juego():
         velocidad_y = (delta_y / distancia) * velocidad_disparo
 
         # Condicional para el origen del disparo (si esta agachado)
-        if not actualizar_agachado:
-            nuevo_disparo = {'x': cuadrado_x + cuadrado_tamaño, 'y': cuadrado_y + cuadrado_tamaño / 4,
+        if not moverse_izquierda :
+            nuevo_disparo = {'x': cuadrado_x + cuadrado_tamaño, 'y': cuadrado_y + 13,
                               'velocidad_x': velocidad_x, 'velocidad_y': velocidad_y}
-        elif actualizar_agachado:
-            nuevo_disparo = {'x': cuadrado_x + cuadrado_tamaño, 'y': cuadrado_y + cuadrado_tamaño / 8,
+        elif moverse_izquierda and moverse_derecha:
+            nuevo_disparo = {'x': cuadrado_x + cuadrado_tamaño, 'y': cuadrado_y + 13,
                               'velocidad_x': velocidad_x, 'velocidad_y': velocidad_y}
+        elif moverse_izquierda:
+            nuevo_disparo = {'x': cuadrado_x , 'y': cuadrado_y + 13,
+                              'velocidad_x': velocidad_x, 'velocidad_y': velocidad_y}
+            
         projectiles.append(nuevo_disparo)
 
-    # Función para dibujar los disparos_g
-    def grunt_disparo(disparos_g):
-        for disparo_g in disparos_g:
-            pygame.draw.rect(pantalla, grey, disparo)
-            
+
     #====Clases de los enemigos y sus funciones====#
     #==Clase del elite amarillo==#
     class Elite_amarillo:
@@ -214,13 +233,13 @@ def juego():
             self.colisiones = 0
 
         def draw(self, pantalla):
-            mostrar_animacion(10,elite_corriendo_b,self.x,self.y)
+            mostrar_animacion(6,elite_corriendo_b,self.x,self.y)
 
         def colisionar(self):
             self.colisiones += 1
 
         def eliminar(self):
-            return self.colisiones >= 6
+            return self.colisiones >= 5
 
     # Lista para almacenar los elites amarillos
     elites_amarillos = []
@@ -230,6 +249,8 @@ def juego():
 
     # Contador de elites amarillos eliminados
     elites_amarillos_eliminados = 0
+
+
 
     # Función para generar un nuevo elite amarillo
     def generar_elite_amarillo():
@@ -260,7 +281,7 @@ def juego():
             self.colisiones += 1
 
         def eliminar(self):
-            return self.colisiones >= 3
+            return self.colisiones >= 5
 
     # Lista para almacenar los grunts
     grunts = []
@@ -297,7 +318,7 @@ def juego():
             self.colisiones += 1
 
         def eliminar(self):
-            return self.colisiones >= 4
+            return self.colisiones >= 5
 
     # Lista para almacenar los jakals
     jakals = []
@@ -366,10 +387,9 @@ def juego():
         # Actualizar la posición de los cuadrados rojos
         for elite_amarillo in elites_amarillos:
             elite_amarillo.x -= elite_amarillo_velocidad
-    
-            #Daño
             if elite_amarillo.x == cuadrado_x:
                 salud -= 49
+                continue
             
         # Eliminar elites amarillos si han sido alcanzados por 5 balas
         for i, elite_amarillo in enumerate(elites_amarillos):
@@ -381,33 +401,22 @@ def juego():
         # Incrementar el contador de cuadrados rojos eliminados
         for elite_amarillo in elites_amarillos:
             if elite_amarillo.eliminar():
-                elites_amarillos_eliminados += 4
+                elites_amarillos_eliminados += 1
                 
         # Eliminar los cuadrados rojos que han sido alcanzados por 5 balas
         elites_amarillos = [elite_amarillo for elite_amarillo in elites_amarillos if not elite_amarillo.eliminar()]
         
         # Generar nuevos cuadrados rojos de forma aleatoria
-        if random.randint(1, 600) == 1:
+        if random.randint(1, 100) == 1:
             generar_elite_amarillo()
-        
+            
         for grunt in grunts:
-            if grunt.x > 499:
+            if grunt.x > 549:
                 grunt.moverse = 1
                 grunt.x -= grunt_velocidad
-            if moverse_derecha == True and cuadrado_x > 449 and grunt.moverse == 0:
+            else: grunt.moverse = 0
+            if moverse_derecha == True and cuadrado_x > 474 and grunt.moverse == 0:
                 grunt.x -= 1
-            if grunt.x <= 499:
-                # Crear un nuevo disparo cada 5 frames
-                if pygame.time.get_ticks() % 15 == 1:
-                    disparo_g = pygame.Rect(x,y + 25, 10, 5)
-                    disparos_g.append(disparo_g)
-
-        # Mover los disparos_g
-        for disparo_g in disparos_g:
-            grunt_disparo.x -= 5  # Velocidad del disparo
-
-        # Eliminar disparos_g que salieron de la pantalla
-        disparos_g = [disparo_g for disparo_g in disparos_g if grunt_disparo.x < pantalla_ancho]
         
         # Eliminar grunts si han sido alcanzados por 5 balas
         for i, grunt in enumerate(grunts):
@@ -416,24 +425,24 @@ def juego():
                     grunt.colisionar()
                     del projectiles[j]
                     
-        # Incrementar el contador de grunts  eliminados
+        # Incrementar el contador de cuadrados rojos eliminados
         for grunt in grunts:
             if grunt.eliminar():
                 grunts_eliminados += 1
         
-        # Eliminar los grunts que han sido alcanzados por los proyectiles
+        # Eliminar los cuadrados rojos que han sido alcanzados por 5 balas
         grunts = [grunt for grunt in grunts if not grunt.eliminar()]
         
-        # Generar nuevos grunt de forma aleatoria
-        if random.randint(1, 100) == 1:
+        # Generar nuevos cuadrados rojos de forma aleatoria
+        if random.randint(1, 250) == 1:
             generar_grunt()
         
         for jakal in jakals:
-            if jakal.x > 449:
+            if jakal.x > 500:
                 jakal.moverse = 1
                 jakal.x -= jakal_velocidad
             else: jakal.moverse = 0
-            if moverse_derecha == True and cuadrado_x > 449 and jakal.moverse == 0:
+            if moverse_derecha == True and cuadrado_x > 474 and jakal.moverse == 0:
                 jakal.x -= 1
             
         # Eliminar grunts si han sido alcanzados por 5 balas
@@ -446,13 +455,13 @@ def juego():
         # Incrementar el contador de cuadrados rojos eliminados
         for jakal in jakals:
             if jakal.eliminar():
-                jakals_eliminados += 2
+                jakals_eliminados += 1
 
         # Eliminar los cuadrados rojos que han sido alcanzados por 5 balas
         jakals = [jakal for jakal in jakals if not jakal.eliminar()]
 
         # Generar nuevos cuadrados rojos de forma aleatoria
-        if random.randint(1, 200) == 1:
+        if random.randint(1, 300) == 1:
             generar_jakal()
 
         # Incrementar el temporizador de disparo
@@ -475,14 +484,14 @@ def juego():
             disparo_automatico()
 
         # Limpiar la pantalla
-        if moverse_derecha == True and cuadrado_x > 400:
+        if moverse_derecha == True and cuadrado_x > 474:
             xbackground1 -= 1
             xbackground2 -=1
-            elite_amarillo_velocidad = 3.6
+            elite_amarillo_velocidad = 3
             grunt_velocidad = 2
             jakal_velocidad = 2
         else:
-            elite_amarillo_velocidad = 3
+            elite_amarillo_velocidad = 2
             grunt_velocidad = 1
             jakal_velocidad = 1
             
@@ -511,8 +520,17 @@ def juego():
         pygame.draw.rect(pantalla, white, (360, 10, 50, 40))
 
         # Dibujar los proyectiles
+        # Dibujar los proyectiles
         for projectil in projectiles:
-            pygame.draw.rect(pantalla, white, (projectil['x'], projectil['y'], 5, 5))
+            if math.sqrt((projectil['x'] - cuadrado_x)**2 + (projectil['y'] - cuadrado_y)**2)< 75 and moverse_izquierda and moverse_derecha:
+                pantalla.blit(disparo, (cuadrado_x + cuadrado_tamaño,cuadrado_y ))
+            elif math.sqrt((projectil['x'] - cuadrado_x)**2 + (projectil['y'] - cuadrado_y)**2)< 75 and moverse_derecha:
+                pantalla.blit(disparo, (cuadrado_x + cuadrado_tamaño,cuadrado_y ))
+            elif math.sqrt((projectil['x'] - cuadrado_x)**2 + (projectil['y'] - cuadrado_y)**2)< 75 and not moverse_derecha and not moverse_izquierda:
+                pantalla.blit(disparo, (cuadrado_x + cuadrado_tamaño,cuadrado_y ))
+            elif math.sqrt((projectil['x'] - cuadrado_x)**2 + (projectil['y'] - cuadrado_y)**2)< 75 and moverse_izquierda :
+                pantalla.blit(disparo2, (cuadrado_x - 29 ,cuadrado_y ))
+            pygame.draw.circle(pantalla, (212,175,55), (projectil['x'], projectil['y']), 2)
 
         # Dibujar los cuadrados rojos
         for elite_amarillo in elites_amarillos:
@@ -523,31 +541,52 @@ def juego():
                 grunt.draw(pantalla)
             else: pantalla.blit(grunt_normal, (grunt.x, grunt.y))
             
-        grunt_disparo(disparos_g)
-            
         for jakal in jakals:
             if jakal.moverse == 1:
                 jakal.draw(pantalla)
             else: pantalla.blit(jakal_normal, (jakal.x, jakal.y))
+            
+        if elites_amarillos_eliminados == 7:
+            musica_nivel.stop()
+            import victoria
+            victoria.victoria()
 
         # Mostrar el contador de cuadrados rojos eliminados
-        marcador = font.render(f'Puntos: {elites_amarillos_eliminados+jakals_eliminados+grunts_eliminados}', True, white)
+        marcador = font.render(f'Puntos: {elites_amarillos_eliminados}', True, white)
         pantalla.blit(marcador, (650, 10))
         
-        vida = font.render(f'Salud: {salud}', True, white)
-        pantalla.blit(vida, (10, 10))
+        # Salud
+        marcador = font.render(f'Salud: {salud}', True, white)
+        pantalla.blit(marcador, (10, 10))
+        
+        if salud == 100:
+            pantalla.blit(vida9, (10,40))
+        elif salud>83:
+            pantalla.blit(vida8, (10,40))
+        elif salud>67:
+            pantalla.blit(vida7, (10,40))
+        elif salud>51:
+            pantalla.blit(vida6, (10,40))
+        elif salud>40:
+            pantalla.blit(vida5, (10,40))
+        elif salud>30:
+            pantalla.blit(vida4, (10,40))
+        elif salud>20:
+            pantalla.blit(vida3, (10,40))
+        elif salud>10:
+            pantalla.blit(vida2, (10,40))
+        elif salud>0:
+            pantalla.blit(vida1, (10,40))
+        elif salud<=0:
+            musica_nivel.stop()
+            import derrota
+            derrota.victoria()
         
 
         # Actualizar la pantalla
         pygame.display.update()
         pygame.time.delay(15)
 
-    # Contador de eliminados
-    jakals_eliminados = 0
-    grunts_eliminados = 0
-    elites_amarillos_eliminados = 0
-    salud = 100
-    
     # Finalizar Pygame
     pygame.quit()
     sys.exit()

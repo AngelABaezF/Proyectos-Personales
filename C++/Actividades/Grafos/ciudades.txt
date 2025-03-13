@@ -1,0 +1,20 @@
+8
+Lar
+Rey
+Sal
+Mty
+Vic
+Slp
+Tam
+CDMX
+Lar Rey
+Lar Mty
+Rey Vic
+Rey Mty
+Vic Mty
+Vic Tam
+Mty Sal
+Sal Slp
+Slp Tam
+Slp CDMX
+Tam CDMX
